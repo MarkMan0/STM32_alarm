@@ -31,7 +31,7 @@ public:
   void begin(uint32_t baud);  ///< Call once only, to init the hardware and start tasks
 
   /// @brief Return the number of bytes available for reading
-  uint16_t available() const {
+  [[nodiscard]] uint16_t available() const {
     return receive_buff_.get_num_occupied();
   }
 
@@ -39,10 +39,10 @@ public:
   /// @{
 
   /// @brief Return and pop one byte from the RX buffer
-  uint8_t get_one();
+  [[nodiscard]] uint8_t get_one();
 
   /// @brief Reads at max @p n bytes into @p dest. @return The number of bytes read
-  uint16_t get_n(uint8_t* dest, uint16_t n);
+  [[nodiscard]] uint16_t get_n(uint8_t* dest, uint16_t n);
 
   /// @}
 

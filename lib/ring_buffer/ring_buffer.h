@@ -38,7 +38,7 @@ public:
     return cnt;
   }
 
-  data_t pop() {
+  [[nodiscard]] data_t pop() {
     assert_param(!is_empty());
 
     data_t ret = buff_[tail_];
@@ -53,19 +53,19 @@ public:
     is_full_ = false;
   }
 
-  const data_t& peek() const {
+  [[nodiscard]] const data_t& peek() const {
     assert_param(!is_empty());
     return buff_[tail_];
   }
 
-  bool is_full() const {
+  [[nodiscard]] bool is_full() const {
     return is_full_;
   }
-  bool is_empty() const {
+  [[nodiscard]] bool is_empty() const {
     return ((not is_full_) && (head_ == tail_));
   }
 
-  uint16_t get_num_occupied() const {
+  [[nodiscard]] uint16_t get_num_occupied() const {
     if (is_full()) {
       return N;
     }
@@ -77,7 +77,7 @@ public:
     }
   }
 
-  uint16_t get_num_occupied_continuous() const {
+  [[nodiscard]] uint16_t get_num_occupied_continuous() const {
     if (head_ < tail_) {
       return N - tail_;
     } else {
@@ -85,11 +85,11 @@ public:
     }
   }
 
-  uint16_t get_num_free() const {
+  [[nodiscard]] uint16_t get_num_free() const {
     return N - get_num_occupied();
   }
 
-  uint16_t get_num_free_continuous() const {
+  [[nodiscard]] uint16_t get_num_free_continuous() const {
     if (head_ < tail_) {
       return tail_ - head_;
     } else {
@@ -98,7 +98,7 @@ public:
   }
 
   /// @brief Moves head by @p n, if @p n number of continuous space is available
-  data_t* reserve(uint16_t n) {
+  [[nodiscard]] data_t* reserve(uint16_t n) {
     if (get_num_free_continuous() < n) {
       return nullptr;
     }
@@ -109,7 +109,7 @@ public:
     return ret;
   }
 
-  uint16_t size() const {
+  [[nodiscard]] uint16_t size() const {
     return N;
   }
 

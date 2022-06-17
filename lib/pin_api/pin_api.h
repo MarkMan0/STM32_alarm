@@ -47,7 +47,7 @@ namespace pin_api {
                                               PA12, PA13, PA14, PA15, PB0, PB1, PB2, PB3, PB4, PB5, PB6,  PB7 };
 
   /// @brief Returns the pointer to the PORT for the current pin or nullptr
-  inline GPIO_TypeDef* pin_name_to_port(const pin_name pin) {
+  [[nodiscard]] inline GPIO_TypeDef* pin_name_to_port(const pin_name pin) {
     constexpr std::array<GPIO_TypeDef*, 8> table = {
 #ifdef GPIOA
       GPIOA,
@@ -99,12 +99,12 @@ namespace pin_api {
   }
 
   /// @brief Returns the HAL pin number for the current pin
-  inline constexpr uint16_t pin_name_to_num(const pin_name pin) {
+  [[nodiscard]] inline constexpr uint16_t pin_name_to_num(const pin_name pin) {
     return 0x1 << (pin % 16);
   }
 
   /// @brief In DEBUG build, checks if the given pin is available on the board. In RELEASE, return true
-  inline constexpr bool pin_is_available(const pin_name pin) {
+  [[nodiscard]] inline constexpr bool pin_is_available(const pin_name pin) {
 #ifdef NDEBUG
     return true;
 #endif
@@ -118,7 +118,7 @@ namespace pin_api {
   }
 
   /// @brief Extracts the pull mode for the given pin_mode
-  constexpr uint16_t get_pull_type(const pin_mode_t mode) {
+  [[nodiscard]] constexpr uint16_t get_pull_type(const pin_mode_t mode) {
     switch (mode) {
       default:
         return GPIO_NOPULL;
@@ -296,7 +296,7 @@ inline void toggle_pin(const pin_name pin) {
   HAL_GPIO_TogglePin(pin_api::pin_name_to_port(pin), pin_api::pin_name_to_num(pin));
 }
 
-inline bool read_pin(const pin_name pin) {
+[[nodiscard]] inline bool read_pin(const pin_name pin) {
   assert_param(pin_api::pin_is_available(pin));
   return HAL_GPIO_ReadPin(pin_api::pin_name_to_port(pin), pin_api::pin_name_to_num(pin));
 }
