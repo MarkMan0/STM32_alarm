@@ -2,12 +2,10 @@
 #include <cmsis_os2.h>
 
 int main() {
+  osKernelInitialize();
 
-    osKernelInitialize();
+  osKernelStart();
 
-    osKernelStart();
-
-    while (1) {
-    }
-
+  while (1) {
+  }
 }
