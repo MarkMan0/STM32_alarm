@@ -1,25 +1,29 @@
-/**
- * @file rtos_utils.h
- * @brief utility functions to ease working with freertos
- */
-
 #pragma once
 
 #include "FreeRTOS.h"
 #include "semphr.h"
 
 namespace utils {
-
   struct Lock {
   private:
     const SemaphoreHandle_t mtx_{};
+    bool is_locked_{ true };
 
   public:
     Lock(SemaphoreHandle_t mtx) : mtx_(mtx) {
       xSemaphoreTake(mtx_, portMAX_DELAY);
     }
     ~Lock() {
-      xSemaphoreGive(mtx_);
+      if (is_locked_) {
+        xSemaphoreGive(mtx_);
+      }
+    }
+
+    Lock(const Lock&) = delete;
+    Lock& operator=(const Lock&) = delete;
+
+    Lock(Lock&& other) : mtx_(other.mtx_) {
+      other.is_locked_ = false;
     }
   };
 
@@ -37,4 +41,14 @@ namespace utils {
   };
 
 
+  template <class T, class U, class V>
+  constexpr inline T constrain(T val, U low, V high) {
+    if (val <= low) {
+      return low;
+    } else if (val >= high) {
+      return high;
+    } else {
+      return val;
+    }
+  }
 }  // namespace utils

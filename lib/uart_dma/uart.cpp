@@ -6,7 +6,7 @@
 #include "uart.h"
 #include "pin_api.h"
 #include <algorithm>
-#include "rtos_utils.h"
+#include "utils.h"
 
 
 void UART_DMA::generic_tx_task(void* ptr) {

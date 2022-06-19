@@ -6,7 +6,7 @@
 #include "main.h"
 #include "pin_api.h"
 #include "uart.h"
-#include "rtos_utils.h"
+#include "utils.h"
 
 /// @details Placed in MSP file, so compiler could inline it for specific cases
 void UART_DMA::rx_event_cb(UART_HandleTypeDef* huart, uint16_t pos) {
