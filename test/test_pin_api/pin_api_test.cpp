@@ -100,7 +100,7 @@ void test_multiple_pins() {
 
 
 
-int main() {
+void test_task(void*) {
   HAL_Init();  // initialize the HAL library
   HAL_Delay(1000);
 

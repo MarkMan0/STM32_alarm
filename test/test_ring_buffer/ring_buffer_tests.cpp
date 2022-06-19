@@ -234,10 +234,7 @@ void test_reserve_and_push() {
 
 
 
-int main() {
-  HAL_Init();
-  HAL_Delay(500);
-
+void test_task(void*) {
   UNITY_BEGIN();
 
   RUN_TEST(test_buffer_create);
