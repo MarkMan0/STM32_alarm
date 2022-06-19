@@ -14,26 +14,7 @@ static UART_HandleTypeDef UartHandle;
 extern "C" {
 #endif
 
-void unityOutputStart() {
-  UartHandle.Instance = USART2;
-  UartHandle.Init.BaudRate = 115200;
-  UartHandle.Init.WordLength = UART_WORDLENGTH_8B;
-  UartHandle.Init.StopBits = UART_STOPBITS_1;
-  UartHandle.Init.Parity = UART_PARITY_NONE;
-  UartHandle.Init.Mode = UART_MODE_TX_RX;
-  UartHandle.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  UartHandle.Init.OverSampling = UART_OVERSAMPLING_16;
-  UartHandle.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-
-  UartHandle.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-
-  if (HAL_UART_Init(&UartHandle) != HAL_OK) {
-    while (1) {
-    }
-  }
-}
-
-void HAL_UART_MspInit(UART_HandleTypeDef* uart) {
+static void UART2_MspInit(UART_HandleTypeDef* uart) {
   if (uart->Instance == USART2) {
     GPIO_InitTypeDef gpio = { 0 };
 
@@ -49,6 +30,28 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uart) {
     HAL_GPIO_Init(GPIOA, &gpio);
   }
 }
+
+void unityOutputStart() {
+  UartHandle.Instance = USART2;
+  UartHandle.Init.BaudRate = 115200;
+  UartHandle.Init.WordLength = UART_WORDLENGTH_8B;
+  UartHandle.Init.StopBits = UART_STOPBITS_1;
+  UartHandle.Init.Parity = UART_PARITY_NONE;
+  UartHandle.Init.Mode = UART_MODE_TX_RX;
+  UartHandle.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  UartHandle.Init.OverSampling = UART_OVERSAMPLING_16;
+  UartHandle.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+
+  UartHandle.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  HAL_UART_RegisterCallback(&UartHandle, HAL_UART_MSPINIT_CB_ID, UART2_MspInit);
+
+  if (HAL_UART_Init(&UartHandle) != HAL_OK) {
+    while (1) {
+    }
+  }
+}
+
+
 
 void unityOutputChar(char c) {
   HAL_UART_Transmit(&UartHandle, (uint8_t*)(&c), 1, 1000);
