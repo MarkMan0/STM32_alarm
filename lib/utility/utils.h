@@ -51,4 +51,16 @@ namespace utils {
       return val;
     }
   }
+
+
+  template <class T, class K, class L>
+  inline constexpr bool within(T val, K low, L high) {
+    return (val >= low) && (val <= high);
+  }
+
+
+  template <class T, class K, class L>
+  inline constexpr bool between(T val, K low, L high) {
+    return (val > low) && (val < high);
+  }
 }  // namespace utils

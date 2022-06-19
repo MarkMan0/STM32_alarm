@@ -12,6 +12,8 @@
 #include <array>
 #include "FreeRTOS.h"
 #include "cmsis_os2.h"
+#include "GFX.h"
+#include "rtos_i2c.h"
 
 void SystemClock_Config(void);
 
