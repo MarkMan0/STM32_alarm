@@ -250,7 +250,6 @@ void test_task(void*) {
   RUN_TEST(test_num_free_cont);
   RUN_TEST(test_reserve_and_push);
 
-  HAL_Delay(500);
   UNITY_END();
 
   while (1) {

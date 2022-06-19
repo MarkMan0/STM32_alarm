@@ -61,6 +61,7 @@ void unityOutputFlush() {
 }
 
 void unityOutputComplete() {
+  HAL_Delay(500);
   __HAL_RCC_USART2_CLK_DISABLE();
   __HAL_RCC_GPIOA_CLK_DISABLE();
 }
