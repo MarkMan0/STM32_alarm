@@ -15,7 +15,7 @@ int main() {
   HAL_Init();
   SystemClock_Config();
 
-  HAL_Delay(500);
+  HAL_Delay(1000);
 
   osKernelInitialize();
   pre_test();
