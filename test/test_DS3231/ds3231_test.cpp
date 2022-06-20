@@ -19,6 +19,7 @@ void test_ds3231() {
 
   // get the start time
   auto start_ms = HAL_GetTick();
+  HAL_Delay(100);
   bool res = rtc.get_time(t);
   auto t_start = t;
   TEST_ASSERT_TRUE_MESSAGE(res, "Get time failed");
@@ -34,10 +35,13 @@ void test_ds3231() {
   t.date = 3;
   t.month = 4;
   t.year = 2010;
+
+  HAL_Delay(100);
   res = rtc.set_time(t);
   TEST_ASSERT_TRUE_MESSAGE(res, "Set time failed");
   t = DS3231::time{ 0 };
 
+  HAL_Delay(100);
   res = rtc.get_time(t);
   TEST_ASSERT_TRUE(res);
   TEST_ASSERT_LESS_OR_EQUAL_MESSAGE(2, 16 - t.sec, "Seconds wrong");
@@ -58,8 +62,10 @@ void test_ds3231() {
       t_start.sec = 0;
     }
   }
+  HAL_Delay(100);
   res = rtc.set_time(t_start);
   TEST_ASSERT_TRUE_MESSAGE(res, "Time restore failed");
+  HAL_Delay(100);
 }
 
 

@@ -34,19 +34,31 @@ public:
 
   [[nodiscard]] bool write(uint8_t address, uint8_t* data, size_t len) {
     utils::Lock lck(mtx_);
-    return HAL_I2C_Master_Transmit(&hi2c_, address, data, len, timeout_) == HAL_OK;
+    portENTER_CRITICAL();
+    auto ret = HAL_I2C_Master_Transmit(&hi2c_, address, data, len, timeout_) == HAL_OK;
+    portEXIT_CRITICAL();
+    return ret;
   }
   [[nodiscard]] bool read(uint8_t address, uint8_t* data, size_t len) {
     utils::Lock lck(mtx_);
-    return HAL_I2C_Master_Receive(&hi2c_, address, data, len, timeout_) == HAL_OK;
+    portENTER_CRITICAL();
+    auto ret = HAL_I2C_Master_Receive(&hi2c_, address, data, len, timeout_) == HAL_OK;
+    portEXIT_CRITICAL();
+    return ret;
   }
   [[nodiscard]] bool write_register(uint8_t address, uint8_t reg_addr, uint8_t* data, size_t len) {
     utils::Lock lck(mtx_);
-    return HAL_I2C_Mem_Write(&hi2c_, address, reg_addr, 1, data, len, timeout_) == HAL_OK;
+    portENTER_CRITICAL();
+    auto ret = HAL_I2C_Mem_Write(&hi2c_, address, reg_addr, 1, data, len, timeout_) == HAL_OK;
+    portEXIT_CRITICAL();
+    return ret;
   }
   [[nodiscard]] bool read_register(uint8_t address, uint8_t reg_addr, uint8_t* data, size_t len) {
     utils::Lock lck(mtx_);
-    return HAL_I2C_Mem_Read(&hi2c_, address, reg_addr, 1, data, len, timeout_) == HAL_OK;
+    portENTER_CRITICAL();
+    auto ret = HAL_I2C_Mem_Read(&hi2c_, address, reg_addr, 1, data, len, timeout_) == HAL_OK;
+    portEXIT_CRITICAL();
+    return ret;
   }
 
   [[nodiscard]] utils::Lock&& get_lock() {
