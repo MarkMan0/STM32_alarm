@@ -16,7 +16,7 @@
 class SSD1306;
 
 struct Pixel {
-  using data_t = uint8_t;
+  using data_t = int;
   data_t x_{ 0 };
   data_t y_{ 0 };
 

@@ -44,6 +44,7 @@ void UART_DMA::uart2_enable_isrs(UART_DMA& uart) {
 }
 
 static void uart2_msp_init(UART_HandleTypeDef* uart) {
+  extern UART_DMA uart2;
   assert_param(uart->Instance == USART2);
   if (uart->Instance != USART2) {
     return;
@@ -112,6 +113,7 @@ void UART_DMA::uart2_hw_init(UART_DMA& uart) {
 
 void UART_DMA::uart2_rx_event_cb(UART_HandleTypeDef* huart, uint16_t pos) {
   assert_param(huart->Instance == USART2);
+  extern UART_DMA uart2;
   uart2.rx_event_cb(huart, pos);
 }
 
@@ -134,6 +136,7 @@ void UART_DMA::uart1_enable_isrs(UART_DMA& uart) {
 }
 
 static void uart1_msp_init(UART_HandleTypeDef* uart) {
+  extern UART_DMA uart1;
   assert_param(uart->Instance == USART1);
   if (uart->Instance != USART1) {
     return;
@@ -202,5 +205,6 @@ void UART_DMA::uart1_hw_init(UART_DMA& uart) {
 
 void UART_DMA::uart1_rx_event_cb(UART_HandleTypeDef* huart, uint16_t pos) {
   assert_param(huart->Instance == USART1);
+  extern UART_DMA uart1;
   uart1.rx_event_cb(huart, pos);
 }

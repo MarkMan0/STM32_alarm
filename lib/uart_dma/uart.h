@@ -150,5 +150,3 @@ public:
 
   ///@}
 };
-
-extern UART_DMA uart2, uart1;

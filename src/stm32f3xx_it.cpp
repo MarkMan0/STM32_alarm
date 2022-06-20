@@ -5,7 +5,7 @@
 
 #include "main.h"
 #include "stm32f3xx_it.h"
-#include "uart.h"
+#include "globals.h"
 
 /******************************************************************************/
 /*           Cortex-M4 Processor Interruption and Exception Handlers          */
@@ -55,25 +55,12 @@ void UsageFault_Handler(void) {
 void DebugMon_Handler(void) {
 }
 
-
-void DMA1_Channel4_IRQHandler(void) {
-  HAL_DMA_IRQHandler(&uart1.hdmatx_);
-}
-
-void DMA1_Channel5_IRQHandler(void) {
-  HAL_DMA_IRQHandler(&uart1.hdmarx_);
-}
-
 void DMA1_Channel6_IRQHandler(void) {
   HAL_DMA_IRQHandler(&uart2.hdmarx_);
 }
 
 void DMA1_Channel7_IRQHandler(void) {
   HAL_DMA_IRQHandler(&uart2.hdmatx_);
-}
-
-void USART1_IRQHandler(void) {
-  HAL_UART_IRQHandler(&uart1.huart_);
 }
 
 void USART2_IRQHandler(void) {

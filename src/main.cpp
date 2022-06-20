@@ -14,12 +14,13 @@
 #include "cmsis_os2.h"
 #include "GFX.h"
 #include "rtos_i2c.h"
+#include "display_task.h"
 
 void SystemClock_Config(void);
 
 
 UART_DMA uart2(UART_DMA::uart2_hw_init, UART_DMA::uart2_enable_isrs);
-UART_DMA uart1(UART_DMA::uart1_hw_init, UART_DMA::uart1_enable_isrs);
+RTOS_I2C i2c;
 
 static void led_task(void*) {
   pin_mode(pins::led, pin_mode_t::OUT_PP);
@@ -48,35 +49,11 @@ static void uart2_task(void*) {
       strncat(str.data(), "\"", str.size() - 1);
       strncat(str.data(), "\n", str.size() - 1);
 
-      uart1.send(str.data());
       uart2.send(str.data());
     }
   }
 }
 
-static void uart1_task(void*) {
-  static std::array<char, 40> str{};
-  uart2.send("Hello from uart 1");
-  while (1) {
-    xTaskNotifyWait(0, UINT32_MAX, nullptr, portMAX_DELAY);
-    if (uart1.available()) {
-      str[0] = '\0';
-      strncat(str.data(), "Got 1: \"", str.size() - 1);
-      while (uart1.available()) {
-        auto c = uart1.get_one();
-        if (c == '\n' || c == '\r') {
-          continue;
-        }
-        char s[] = { c, '\0' };
-        strncat(str.data(), s, str.size() - 1);
-      }
-      strncat(str.data(), "\"", str.size() - 1);
-      strncat(str.data(), "\n", str.size() - 1);
-
-      uart2.send(str.data());
-    }
-  }
-}
 
 int main(void) {
   HAL_Init();
@@ -85,17 +62,16 @@ int main(void) {
   osKernelInitialize();
 
   uart2.begin(115200);
-  uart1.begin(115200);
+  i2c.init_i2c1();
+  display.begin();
+  gfx.insert_ssd1306_dependency(&display);
 
-
-
-  TaskHandle_t led_handle, uart1_handle, uart2_handle;
+  TaskHandle_t led_handle, uart2_handle, display_handle;
   xTaskCreate(led_task, "blink task", 64, nullptr, osPriorityLow1, &led_handle);
   xTaskCreate(uart2_task, "uart2 RX task", 64, nullptr, osPriorityLow1, &uart2_handle);
-  xTaskCreate(uart1_task, "uart1 RX task", 64, nullptr, osPriorityLow1, &uart1_handle);
+  xTaskCreate(display_task, "display task", 128, nullptr, osPriorityLow1, &display_handle);
 
   uart2.register_task_to_notify_on_rx(uart2_handle);
-  uart1.register_task_to_notify_on_rx(uart1_handle);
 
   osKernelStart();
   while (1) {
