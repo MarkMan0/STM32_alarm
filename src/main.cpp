@@ -15,6 +15,7 @@
 #include "GFX.h"
 #include "rtos_i2c.h"
 #include "display_task.h"
+#include "uart_task.h"
 
 void SystemClock_Config(void);
 
@@ -30,29 +31,7 @@ static void led_task(void*) {
   }
 }
 
-static void uart2_task(void*) {
-  static std::array<char, 40> str{};
-  uart2.send("Hello from uart 2");
-  while (1) {
-    xTaskNotifyWait(0, UINT32_MAX, nullptr, portMAX_DELAY);
-    if (uart2.available()) {
-      str[0] = '\0';
-      strncat(str.data(), "Got 2: \"", str.size() - 1);
-      while (uart2.available()) {
-        auto c = uart2.get_one();
-        if (c == '\n' || c == '\r') {
-          continue;
-        }
-        char s[] = { c, '\0' };
-        strncat(str.data(), s, str.size() - 1);
-      }
-      strncat(str.data(), "\"", str.size() - 1);
-      strncat(str.data(), "\n", str.size() - 1);
 
-      uart2.send(str.data());
-    }
-  }
-}
 
 
 int main(void) {
@@ -68,7 +47,7 @@ int main(void) {
 
   TaskHandle_t led_handle, uart2_handle, display_handle;
   xTaskCreate(led_task, "blink task", 64, nullptr, osPriorityLow1, &led_handle);
-  xTaskCreate(uart2_task, "uart2 RX task", 64, nullptr, osPriorityLow1, &uart2_handle);
+  xTaskCreate(uart_task, "uart2 RX task", 64, nullptr, osPriorityLow1, &uart2_handle);
   xTaskCreate(display_task, "display task", 128, nullptr, osPriorityLow1, &display_handle);
 
   uart2.register_task_to_notify_on_rx(uart2_handle);
