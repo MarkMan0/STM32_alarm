@@ -12,12 +12,10 @@
 void UART_DMA::rx_event_cb(UART_HandleTypeDef* huart, uint16_t pos) {
   assert_param(&huart_ == huart);
 
-  utils::LockISR lck(rx_buff_mtx_);
+  uint16_t num_received = pos - last_rxdma_pos_;
+  dma_buff_.advance_head(num_received);
 
-  for (; last_rxdma_pos_ < pos; ++last_rxdma_pos_) {
-    receive_buff_.push(dma_buff_[last_rxdma_pos_]);
-  }
-  last_rxdma_pos_ = last_rxdma_pos_ % dma_buff_.size();
+  last_rxdma_pos_ = (num_received + last_rxdma_pos_) % dma_buff_.size();
 
   assert_param(rx_notify_task_ != nullptr);
   if (rx_notify_task_ != nullptr) {

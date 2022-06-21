@@ -32,7 +32,7 @@ public:
 
   /// @brief Return the number of bytes available for reading
   [[nodiscard]] uint16_t available() const {
-    return receive_buff_.get_num_occupied();
+    return dma_buff_.get_num_occupied();
   }
 
   /// @name getters from buffer
@@ -99,17 +99,17 @@ public:
 private:
   uint16_t vprintf(const char* fmt, va_list args);
 
-  SemaphoreHandle_t rx_buff_mtx_,  ///< Mutex to lock the transmit buffer
-      tx_buff_mtx_;                ///< Mutex to lock the receive buffer
+  SemaphoreHandle_t tx_buff_mtx_;  ///< Mutex to lock the receive buffer
 
   TaskHandle_t tx_task_;  ///< Handle to task that calls tick()
 
   TaskHandle_t rx_notify_task_{ nullptr };  ///< Task that will be notified on RX
 
   uint32_t baudrate_{ 115200 };
-  uint16_t last_rxdma_pos_{ 0 };           ///< Used in rx event callback to track DMA
-  std::array<uint8_t, 64> dma_buff_;       ///< Buffer sued by the DMA to receive
-  RingBuffer<uint8_t, 64> receive_buff_;   ///< Messages from DMA buffer are put here
+  uint16_t last_rxdma_pos_{ 0 };  ///< Used in rx event callback to track DMA
+
+
+  RingBuffer<uint8_t, 128> dma_buff_;
   RingBuffer<uint8_t, 64> transmit_buff_;  ///< Buffer for non-immediate transmission
 
   const hw_init_fcn_t* hw_init_cb;

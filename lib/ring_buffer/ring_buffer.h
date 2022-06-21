@@ -10,13 +10,12 @@
 
 template <class T = uint8_t, uint16_t N = 64>
 class RingBuffer {
-private:
+public:
   using data_t = T;
   std::array<data_t, N> buff_;
-  volatile uint16_t head_{}, tail_{};
+  uint16_t head_{}, tail_{};
   bool is_full_ = false;
 
-public:
   uint16_t push(const data_t& d) {
     if (is_full()) {
       return 0;
@@ -117,5 +116,33 @@ public:
     is_full_ = false;
     head_ = 0;
     tail_ = 0;
+  }
+
+
+  /// @name iterating
+  /// @{
+  /// @brief first occupied index in buffer
+  size_t begin() {
+    return tail_;
+  }
+  /// @brief once past last occupied
+  size_t end() {
+    return head_;
+  }
+  /// @brief move the index @p it by one
+  void advance_idx(size_t& idx) {
+    ++idx;
+    idx = idx % buff_.size();
+  }
+  /// @}
+
+  /// @brief move head position by N
+  void advance_head(size_t n) {
+    for (int i = 0; i < n; ++i) {
+      // data is written by DMA, so if full, data is overwritten, which shouldn't happen
+      assert_param(not is_full());
+      ++head_;
+      head_ = head_ % buff_.size();
+    }
   }
 };

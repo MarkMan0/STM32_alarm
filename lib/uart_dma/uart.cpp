@@ -25,14 +25,12 @@ void UART_DMA::begin(uint32_t baud) {
   hw_init_cb(*this);
   isr_enable_cb(*this);
 
-  rx_buff_mtx_ = xSemaphoreCreateBinary();
   tx_buff_mtx_ = xSemaphoreCreateBinary();
-  xSemaphoreGive(rx_buff_mtx_);
   xSemaphoreGive(tx_buff_mtx_);
   xTaskCreate(generic_tx_task, "tx task", 128, this, osPriorityAboveNormal1, &tx_task_);
 
 
-  HAL_UART_Receive_DMA(&huart_, dma_buff_.data(), dma_buff_.size());
+  HAL_UART_Receive_DMA(&huart_, dma_buff_.buff_.data(), dma_buff_.buff_.size());
   huart_.ReceptionType = HAL_UART_RECEPTION_TOIDLE;  // also reacts to IDLE interrupt, so only one callback is needed
 
   // enable IDLE interrupt
@@ -86,21 +84,21 @@ void UART_DMA::reset_buffers() {
     transmit_buff_.reset();
   }
   {
-    utils::Lock lck(rx_buff_mtx_);
-    receive_buff_.reset();
+    while (dma_buff_.get_num_occupied()) {
+      dma_buff_.pop();
+    }
   }
 }
 
 uint8_t UART_DMA::get_one() {
-  utils::Lock lck(rx_buff_mtx_);
-  return receive_buff_.pop();
+  return dma_buff_.pop();
 }
 
 uint16_t UART_DMA::get_n(uint8_t* dst, uint16_t n) {
-  n = std::min(n, receive_buff_.get_num_occupied());
+  n = std::min(n, dma_buff_.get_num_occupied());
 
   for (int i = 0; i < n; ++i) {
-    dst[i] = receive_buff_.pop();
+    dst[i] = dma_buff_.pop();
   }
   return n;
 }
