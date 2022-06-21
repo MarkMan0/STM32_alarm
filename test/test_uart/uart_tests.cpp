@@ -8,7 +8,7 @@ void tearDown() {
   uart1.flush();
   HAL_Delay(500);
   while (uart1.available()) {
-    uart1.get_one();
+    UNUSED(uart1.get_one());
   }
   uart1.reset_buffers();
 }

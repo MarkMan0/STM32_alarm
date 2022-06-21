@@ -42,7 +42,7 @@ void test_is_full() {
   buff.push(1);
   buff.push(2);
   TEST_ASSERT_TRUE(buff.is_full());
-  buff.pop();
+  UNUSED(buff.pop());
   TEST_ASSERT_FALSE(buff.is_full());
 }
 
@@ -54,9 +54,9 @@ void test_is_empty() {
   TEST_ASSERT_FALSE(buff.is_empty());
   buff.push(2);
   TEST_ASSERT_FALSE(buff.is_empty());
-  buff.pop();
+  UNUSED(buff.pop());
   TEST_ASSERT_FALSE(buff.is_empty());
-  buff.pop();
+  UNUSED(buff.pop());
   TEST_ASSERT_TRUE(buff.is_empty());
 }
 
@@ -109,12 +109,12 @@ void test_num_free_occupied() {
   TEST_ASSERT_EQUAL(3, buff.get_num_free());
   TEST_ASSERT_EQUAL(2, buff.get_num_occupied());
 
-  buff.pop();
+  UNUSED(buff.pop());
   TEST_ASSERT_EQUAL(4, buff.get_num_free());
   TEST_ASSERT_EQUAL(1, buff.get_num_occupied());
 
 
-  buff.pop();
+  UNUSED(buff.pop());
   TEST_ASSERT_EQUAL(5, buff.get_num_free());
   TEST_ASSERT_EQUAL(0, buff.get_num_occupied());
 
@@ -138,7 +138,7 @@ void test_push_n() {
   TEST_ASSERT_EQUAL(3, buff.push(arr, 3));
   TEST_ASSERT_EQUAL(1, buff.push(arr, 2));
 
-  buff.pop();
+  UNUSED(buff.pop());
   TEST_ASSERT_EQUAL(1, buff.push(arr, 2));
 }
 
@@ -192,13 +192,13 @@ void test_num_free_cont() {
   buff.push(2);
   TEST_ASSERT_EQUAL(3, buff.get_num_free_continuous());
 
-  buff.pop();
-  buff.pop();
+  UNUSED(buff.pop());
+  UNUSED(buff.pop());
   TEST_ASSERT_EQUAL(3, buff.get_num_free_continuous());
 
   buff.push(3);
   buff.push(4);
-  buff.pop();
+  UNUSED(buff.pop());
   TEST_ASSERT_EQUAL(1, buff.get_num_free_continuous());
   buff.push(5);
   TEST_ASSERT_EQUAL(3, buff.get_num_free_continuous());

@@ -85,7 +85,7 @@ void UART_DMA::reset_buffers() {
   }
   {
     while (dma_buff_.get_num_occupied()) {
-      dma_buff_.pop();
+      UNUSED(dma_buff_.pop());
     }
   }
 }

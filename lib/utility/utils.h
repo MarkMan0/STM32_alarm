@@ -21,8 +21,11 @@ namespace utils {
 
     Lock(const Lock&) = delete;
     Lock& operator=(const Lock&) = delete;
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+    // this will always be initialized, not sure why the warning is shown
     Lock(Lock&& other) : mtx_(other.mtx_) {
+#pragma GCC diagnostic pop
       other.is_locked_ = false;
     }
   };

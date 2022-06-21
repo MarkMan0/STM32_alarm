@@ -138,7 +138,7 @@ public:
 
   /// @brief move head position by N
   void advance_head(size_t n) {
-    for (int i = 0; i < n; ++i) {
+    for (unsigned i = 0; i < n; ++i) {
       // data is written by DMA, so if full, data is overwritten, which shouldn't happen
       assert_param(not is_full());
       ++head_;
