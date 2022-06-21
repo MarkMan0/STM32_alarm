@@ -6,7 +6,7 @@
 namespace utils {
   struct Lock {
   private:
-    const SemaphoreHandle_t mtx_{};
+    const SemaphoreHandle_t mtx_{ nullptr };
     bool is_locked_{ true };
 
   public:

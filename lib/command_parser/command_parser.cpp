@@ -3,36 +3,76 @@
 #include <cstring>
 #include <algorithm>
 
-void StringParser::set_string(const char* str) {
-  str_ = str;
-  str_sz_ = strlen(str);
+
+bool StringParser::is_end_char(char c) const {
+  return c == '\n' || c == '\r' || c == '\0';
 }
 
-void StringParser::reset() {
-  str_ = nullptr;
-  str_sz_ = 0;
-}
+bool StringParser::tick(char c) {
+  bool command_ready = false;
+  switch (state_) {
+    case WAITING_START:
+      if (not std::isblank(c)) {
+        reset();
+        write_index_ = 0;
+        command_[write_index_++] = c;
+        state_ = READING_COMMAND;
+      }
+      break;
 
-char StringParser::get_prefix() const {
-  if (has_string()) {
-    return str_[get_first_not_whitespace()];
+    case READING_COMMAND:
+      if (write_index_ == command_.size()) {
+        state_ = OVERFLOW;
+      } else if (is_end_char(c)) {
+        state_ = WAITING_START;
+        command_ready = true;
+      } else {
+        command_[write_index_++] = c;
+      }
+      break;
+
+    case OVERFLOW:
+      if (is_end_char(c)) {
+        state_ = WAITING_START;
+      }
+      break;
+  }
+
+  if (command_ready) {
+    process_command();
+    return true;
   } else {
-    return 0;
+    return false;
   }
 }
 
-uint16_t StringParser::get_number() const {
-  if (!has_string()) return -1;
+void StringParser::process_command() {
+  const size_t cmd_len = strlen(command_.data());
 
-  int start = get_first_not_whitespace() + 1;
-  return atoi(str_ + start);
+  if (cmd_len < 2) {
+    return;
+  }
+
+  if (std::isalpha(command_[0])) {
+    prefix_ = std::toupper(command_[0]);
+  }
+  if (std::isdigit(command_[1])) {
+    code_ = atoi(command_.data() + 1);
+  }
+}
+
+void StringParser::reset() {
+  prefix_ = std::nullopt;
+  code_ = std::nullopt;
+  write_index_ = 0;
+  std::fill(command_.begin(), command_.end(), 0);
 }
 
 bool StringParser::get_parameter(char param, int16_t& dest, int16_t def) const {
   dest = def;
-  if (!has_string()) return false;
-  const auto end = str_ + str_sz_;  // create crude end iterator
-  const auto place = std::find(str_, end, param);
+  if (!is_valid()) return false;
+  const auto end = command_.data() + strlen(command_.data());     // create crude end iterator
+  const auto place = std::find(command_.data() + 1, end, param);  // skip first char / prefix when searching
   if (place == end) return false;
 
   if (*(place + 1) == '\0' || std::isblank(*(place + 1))) {
@@ -42,18 +82,4 @@ bool StringParser::get_parameter(char param, int16_t& dest, int16_t def) const {
 
   dest = atoi(place + 1);  // convert to int
   return true;
-}
-
-bool StringParser::has_string() const {
-  return str_ != nullptr;
-}
-
-size_t StringParser::get_first_not_whitespace() const {
-  if (!has_string()) return 0;
-
-  int ind = 0;
-  while (str_[ind] != '\0' && (str_[ind] == ' ' || str_[ind] == '\n' || str_[ind] == '\r')) {
-    ++ind;
-  }
-  return ind;
 }
