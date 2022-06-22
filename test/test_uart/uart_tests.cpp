@@ -107,4 +107,30 @@ void test_printf() {
 }
 
 
+void test_printf_overflow() {
+  uart1.printf("%060d", 0);
+  uart1.flush();
+  HAL_Delay(100);
+  int cnt = 0;
+  while (uart1.available()) {
+    char c = uart1.get_one();
+    TEST_ASSERT_TRUE(c == '0' || c == '\0');
+    ++cnt;
+  }
+  TEST_ASSERT_EQUAL(61, cnt);
+
+
+  TEST_ASSERT_EQUAL(10, uart1.printf("HHHHHHHHHH"));
+  uart1.flush();
+  HAL_Delay(100);
+  cnt = 0;
+  while (uart1.available()) {
+    char c = uart1.get_one();
+    TEST_ASSERT_TRUE(c == 'H' || c == '\0');
+    ++cnt;
+  }
+  TEST_ASSERT_EQUAL(11, cnt);
+}
+
+
 UART_DMA uart1(UART_DMA::uart1_hw_init, UART_DMA::uart1_enable_isrs);

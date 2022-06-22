@@ -14,7 +14,7 @@ void test_task(void*) {
   RUN_TEST(test_transmit_data);
   RUN_TEST(test_send_data);
   RUN_TEST(test_printf);
-
+  RUN_TEST(test_printf_overflow);
 
   UNITY_END();
 

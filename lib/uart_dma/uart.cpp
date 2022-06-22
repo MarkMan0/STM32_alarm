@@ -46,8 +46,6 @@ void UART_DMA::send(const void* buff, size_t sz) {
 }
 
 void UART_DMA::flush() {
-  utils::Lock lck(tx_buff_mtx_);
-
   while (uint16_t n = transmit_buff_.get_num_occupied_continuous()) {
     for (int i = 0; i < 20; ++i) {
       if (HAL_OK == HAL_UART_Transmit_DMA(&huart_, const_cast<uint8_t*>(&transmit_buff_.peek()), n)) {
@@ -61,6 +59,7 @@ void UART_DMA::flush() {
 
 void UART_DMA::tick() {
   xTaskNotifyWait(0, UINT32_MAX, nullptr, portMAX_DELAY);
+  utils::Lock lck(tx_buff_mtx_);
   flush();
 }
 
@@ -71,6 +70,12 @@ uint16_t UART_DMA::vprintf(const char* fmt, va_list args) {
   utils::Lock lck(tx_buff_mtx_);
 
   auto ptr = transmit_buff_.reserve(msglen + 1);
+  if (!ptr) {
+    flush();
+    transmit_buff_.reset();
+    ptr = transmit_buff_.reserve(msglen + 1);
+  }
+
   if (!ptr) {
     return 0;
   }
