@@ -93,6 +93,10 @@ public:
     rx_notify_task_ = t;
   }
 
+  const RingBuffer<uint8_t, 128>& get_dma_buff() const {
+    return dma_buff_;
+  }
+
   UART_HandleTypeDef huart_;
   DMA_HandleTypeDef hdmarx_, hdmatx_;
 

@@ -122,17 +122,35 @@ public:
   /// @name iterating
   /// @{
   /// @brief first occupied index in buffer
-  size_t begin() {
+  [[nodiscard]] size_t begin() const {
     return tail_;
   }
   /// @brief once past last occupied
-  size_t end() {
+  [[nodiscard]] size_t end() const {
     return head_;
   }
-  /// @brief move the index @p it by one
-  void advance_idx(size_t& idx) {
+  /// @brief move the index @p idx by one
+  [[nodiscard]] size_t increment_idx(size_t idx) const {
     ++idx;
     idx = idx % buff_.size();
+    return idx;
+  }
+  /// @brief decrement index @p idx by one
+  [[nodiscard]] size_t decrement_idx(size_t idx) const {
+    if (idx == 0) {
+      idx = buff_.size() - 1;
+    } else {
+      --idx;
+    }
+    return idx;
+  }
+
+  [[nodiscard]] size_t rbegin() const {
+    return decrement_idx(head_);
+  }
+
+  [[nodiscard]] size_t rend() const {
+    return decrement_idx(tail_);
   }
   /// @}
 

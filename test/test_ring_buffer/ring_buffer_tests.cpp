@@ -233,6 +233,85 @@ void test_reserve_and_push() {
 }
 
 
+void test_increment_idx() {
+  RingBuffer<char, 5> buff{};
+
+  size_t idx = 0;
+  idx = buff.increment_idx(idx);
+  TEST_ASSERT_EQUAL(1, idx);
+
+  idx = 4;
+  idx = buff.increment_idx(idx);
+  TEST_ASSERT_EQUAL(0, idx);
+  idx = buff.increment_idx(idx);
+  TEST_ASSERT_EQUAL(1, idx);
+}
+
+void test_decrement_idx() {
+  RingBuffer<char, 5> buff{};
+
+  size_t idx = 1;
+  idx = buff.decrement_idx(idx);
+  TEST_ASSERT_EQUAL(0, idx);
+  idx = buff.decrement_idx(idx);
+  TEST_ASSERT_EQUAL(4, idx);
+  idx = buff.decrement_idx(idx);
+  TEST_ASSERT_EQUAL(3, idx);
+}
+
+void test_forward_iterators() {
+  RingBuffer<char, 5> buff{};
+  char vals[] = { 78, 10, 20 };
+
+  TEST_ASSERT_EQUAL(buff.begin(), buff.end());
+
+  buff.push(vals[0]);
+  auto beg = buff.begin();
+  TEST_ASSERT_EQUAL(vals[0], buff.buff_[beg]);
+  beg = buff.increment_idx(beg);
+  TEST_ASSERT_EQUAL(buff.end(), beg);
+
+  UNUSED(buff.pop());
+  buff.push(vals[1]);
+  buff.push(vals[2]);
+  beg = buff.begin();
+
+  int i = 1;
+  while (beg != buff.end()) {
+    TEST_ASSERT_EQUAL(vals[i], buff.buff_[beg]);
+    beg = buff.increment_idx(beg);
+    ++i;
+  }
+}
+
+void test_reverse_iterators() {
+  RingBuffer<char, 5> buff{};
+  char vals[] = { 78, 10, 20 };
+
+  TEST_ASSERT_EQUAL(buff.rbegin(), buff.rend());
+
+  buff.push(vals[0]);
+  auto rbeg = buff.rbegin();
+  TEST_ASSERT_EQUAL(vals[0], buff.buff_[rbeg]);
+
+  rbeg = buff.decrement_idx(rbeg);
+  TEST_ASSERT_EQUAL(buff.rend(), rbeg);
+
+
+  UNUSED(buff.pop());
+  buff.push(vals[1]);
+  buff.push(vals[2]);
+  rbeg = buff.rbegin();
+
+
+  int i = 2;
+  while (rbeg != buff.rend()) {
+    TEST_ASSERT_EQUAL(vals[i], buff.buff_[rbeg]);
+    rbeg = buff.decrement_idx(rbeg);
+    --i;
+  }
+}
+
 
 void test_task(void*) {
   UNITY_BEGIN();
@@ -249,6 +328,10 @@ void test_task(void*) {
   RUN_TEST(test_get_num_occupied_continuous);
   RUN_TEST(test_num_free_cont);
   RUN_TEST(test_reserve_and_push);
+  RUN_TEST(test_increment_idx);
+  RUN_TEST(test_decrement_idx);
+  RUN_TEST(test_forward_iterators);
+  RUN_TEST(test_reverse_iterators);
 
   UNITY_END();
 
