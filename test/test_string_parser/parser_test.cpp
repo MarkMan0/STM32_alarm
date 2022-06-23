@@ -68,6 +68,23 @@ void test_get_param() {
   TEST_ASSERT_EQUAL(99, dst);
 }
 
+void test_multiple_commands() {
+  feed_parser(parser, "C20 G50\n");
+  int16_t dst{ 0 };
+
+  TEST_ASSERT_EQUAL_CHAR('C', parser.get_prefix());
+  TEST_ASSERT_EQUAL(20, parser.get_code());
+  TEST_ASSERT_TRUE(parser.get_parameter('G', dst));
+  TEST_ASSERT_EQUAL(50, dst);
+
+  feed_parser(parser, "\n\rQ80 A39\n");
+  TEST_ASSERT_EQUAL_CHAR('Q', parser.get_prefix());
+  TEST_ASSERT_EQUAL(80, parser.get_code());
+  TEST_ASSERT_FALSE(parser.get_parameter('G', dst));
+  TEST_ASSERT_TRUE(parser.get_parameter('A', dst));
+  TEST_ASSERT_EQUAL(39, dst);
+}
+
 
 void test_task(void*) {
   UNITY_BEGIN();
@@ -78,6 +95,7 @@ void test_task(void*) {
   RUN_TEST(test_code);
   RUN_TEST(test_default_param);
   RUN_TEST(test_get_param);
+  RUN_TEST(test_multiple_commands);
 
   UNITY_END();
   while (1) {

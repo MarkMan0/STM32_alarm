@@ -16,6 +16,26 @@
 #include "rtos_i2c.h"
 #include "display_task.h"
 #include "uart_task.h"
+#include "command_parser.h"
+#include "globals.h"
+
+
+void CommandDispatcher::A0() {
+  uart2.println("A0");
+  HAL_Delay(3000);
+  uart2.println("A0_done");
+}
+void CommandDispatcher::A1() {
+  uart2.println("A1");
+  HAL_Delay(3000);
+  uart2.println("A1_done");
+}
+void CommandDispatcher::T100() {
+  uart2.println("T100");
+  HAL_Delay(3000);
+  uart2.println("T100_done");
+}
+
 
 void SystemClock_Config(void);
 
@@ -46,9 +66,9 @@ int main(void) {
   gfx.insert_ssd1306_dependency(&display);
 
   TaskHandle_t led_handle, uart2_handle, display_handle;
-  xTaskCreate(led_task, "blink task", 64, nullptr, osPriorityLow1, &led_handle);
-  xTaskCreate(uart_task, "uart2 RX task", 64, nullptr, osPriorityLow1, &uart2_handle);
-  xTaskCreate(display_task, "display task", 128, nullptr, osPriorityLow1, &display_handle);
+  // xTaskCreate(led_task, "blink task", 64, nullptr, osPriorityNormal, &led_handle);
+  xTaskCreate(uart_task, "uart2 RX task", 64, nullptr, osPriorityNormal, &uart2_handle);
+  // xTaskCreate(display_task, "display task", 128, nullptr, osPriorityNormal, &display_handle);
 
   uart2.register_task_to_notify_on_rx(uart2_handle);
 

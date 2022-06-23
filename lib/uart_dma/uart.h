@@ -9,7 +9,7 @@
 #include "semphr.h"
 #include "task.h"
 #include "cmsis_os2.h"
-
+#include "utils.h"
 
 
 
@@ -79,6 +79,22 @@ public:
     const auto res = this->vprintf(fmt, args);
     va_end(args);
     if (res) {
+      xTaskNotify(tx_task_, 0, eNoAction);
+    }
+    return res;
+  }
+
+  uint16_t println(const char* fmt, ...) {
+    std::va_list args;
+    va_start(args, fmt);
+    const auto res = this->vprintf(fmt, args);
+    va_end(args);
+
+    if (res) {
+      {
+        utils::Lock lck(tx_buff_mtx_);
+        transmit_buff_.push('\n');
+      }
       xTaskNotify(tx_task_, 0, eNoAction);
     }
     return res;

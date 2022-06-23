@@ -3,6 +3,7 @@
 #include "main.h"
 #include <array>
 #include <optional>
+#include "uart.h"
 
 class StringParser {
 public:
@@ -35,12 +36,18 @@ public:
     return retval;
   }
 
+  const char* get_str() const {
+    return command_.data();
+  }
+
+  static bool is_end_char(char);
+
 private:
   void process_command();
 
-  bool is_end_char(char) const;
 
-  enum { WAITING_START, READING_COMMAND, OVERFLOW } state_{ WAITING_START };
+  enum state_t { WAITING_START, READING_COMMAND, COMMAND_OVERFLOW };
+  state_t state_{ WAITING_START };
 
   std::array<char, 64> command_;
   size_t write_index_;
@@ -48,4 +55,34 @@ private:
   bool overflow_flag_{ false };
   std::optional<char> prefix_;
   std::optional<uint16_t> code_;
+};
+
+
+
+class CommandDispatcher {
+public:
+  /// @name commands
+  /// @{
+  static void T100();  ///< test command, does nothing
+  static void A0();    ///< request time from RTC
+  static void A1();    ///< set RTC time
+  /// @}
+
+  void input_char(char c);
+
+  void inject_uart_dependency(UART_DMA* uart) {
+    uart_ = uart;
+  }
+
+private:
+  void send_ack(int);
+  void send_err(int);
+
+  UART_DMA* uart_{ nullptr };
+
+  using cmd_fcn_ptr = void (*)();
+  cmd_fcn_ptr get_fcn_from_cmd() const;
+  cmd_fcn_ptr search_T_code() const;
+  cmd_fcn_ptr search_A_code() const;
+  StringParser parser_;
 };

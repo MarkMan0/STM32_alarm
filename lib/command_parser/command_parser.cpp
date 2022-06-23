@@ -3,8 +3,7 @@
 #include <cstring>
 #include <algorithm>
 
-
-bool StringParser::is_end_char(char c) const {
+bool StringParser::is_end_char(char c) {
   return c == '\n' || c == '\r' || c == '\0';
 }
 
@@ -12,7 +11,7 @@ bool StringParser::tick(char c) {
   bool command_ready = false;
   switch (state_) {
     case WAITING_START:
-      if (not std::isblank(c)) {
+      if (not std::isspace(c)) {
         reset();
         write_index_ = 0;
         command_[write_index_++] = c;
@@ -22,7 +21,7 @@ bool StringParser::tick(char c) {
 
     case READING_COMMAND:
       if (write_index_ == command_.size()) {
-        state_ = OVERFLOW;
+        state_ = COMMAND_OVERFLOW;
       } else if (is_end_char(c)) {
         state_ = WAITING_START;
         command_ready = true;
@@ -31,7 +30,7 @@ bool StringParser::tick(char c) {
       }
       break;
 
-    case OVERFLOW:
+    case COMMAND_OVERFLOW:
       if (is_end_char(c)) {
         state_ = WAITING_START;
       }
@@ -82,4 +81,73 @@ bool StringParser::get_parameter(char param, int16_t& dest, int16_t def) const {
 
   dest = atoi(place + 1);  // convert to int
   return true;
+}
+
+CommandDispatcher::cmd_fcn_ptr CommandDispatcher::search_T_code() const {
+  int code = parser_.get_code();
+
+  switch (code) {
+    case 100:
+      return CommandDispatcher::T100;
+
+    default:
+      return nullptr;
+  }
+}
+
+CommandDispatcher::cmd_fcn_ptr CommandDispatcher::search_A_code() const {
+  int code = parser_.get_code();
+
+  switch (code) {
+    case 0:
+      return CommandDispatcher::A0;
+    case 1:
+      return CommandDispatcher::A1;
+
+    default:
+      return nullptr;
+  }
+}
+
+
+
+CommandDispatcher::cmd_fcn_ptr CommandDispatcher::get_fcn_from_cmd() const {
+  if (not parser_.is_valid()) {
+    return nullptr;
+  }
+
+  char prefix = parser_.get_prefix();
+
+  switch (prefix) {
+    case 'A':
+      return search_A_code();
+    case 'T':
+      return search_T_code();
+
+    default:
+      return nullptr;
+  }
+}
+
+void CommandDispatcher::send_ack(int free) {
+  assert_param(uart_ != nullptr);
+  uart_->println("ACK %d", free);
+}
+
+void CommandDispatcher::send_err(int free) {
+  assert_param(uart_ != nullptr);
+  uart_->println("Err %d: Unknown command %s", free, parser_.get_str());
+}
+
+void CommandDispatcher::input_char(char c) {
+  if (parser_.tick(c)) {
+    auto cmd = get_fcn_from_cmd();
+    auto free = uart_->get_dma_buff().get_num_free();
+    if (cmd) {
+      send_ack(free);
+      cmd();
+    } else {
+      send_err(free);
+    }
+  }
 }
