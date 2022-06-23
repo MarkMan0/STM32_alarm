@@ -88,7 +88,7 @@ CommandDispatcher::cmd_fcn_ptr CommandDispatcher::search_T_code() const {
 
   switch (code) {
     case 100:
-      return CommandDispatcher::T100;
+      return &CommandDispatcher::T100;
 
     default:
       return nullptr;
@@ -100,9 +100,9 @@ CommandDispatcher::cmd_fcn_ptr CommandDispatcher::search_A_code() const {
 
   switch (code) {
     case 0:
-      return CommandDispatcher::A0;
+      return &CommandDispatcher::A0;
     case 1:
-      return CommandDispatcher::A1;
+      return &CommandDispatcher::A1;
 
     default:
       return nullptr;
@@ -130,12 +130,10 @@ CommandDispatcher::cmd_fcn_ptr CommandDispatcher::get_fcn_from_cmd() const {
 }
 
 void CommandDispatcher::send_ack(int free) {
-  assert_param(uart_ != nullptr);
   uart_->println("ACK %d", free);
 }
 
 void CommandDispatcher::send_err(int free) {
-  assert_param(uart_ != nullptr);
   uart_->println("Err %d: Unknown command %s", free, parser_.get_str());
 }
 
@@ -145,7 +143,7 @@ void CommandDispatcher::input_char(char c) {
     auto free = uart_->get_dma_buff().get_num_free();
     if (cmd) {
       send_ack(free);
-      cmd();
+      (this->*cmd)();
     } else {
       send_err(free);
     }

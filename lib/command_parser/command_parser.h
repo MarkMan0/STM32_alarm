@@ -63,24 +63,23 @@ class CommandDispatcher {
 public:
   /// @name commands
   /// @{
-  static void T100();  ///< test command, does nothing
-  static void A0();    ///< request time from RTC
-  static void A1();    ///< set RTC time
+  void T100();  ///< test command, does nothing
+  void A0();    ///< request time from RTC
+  void A1();    ///< set RTC time
   /// @}
 
-  void input_char(char c);
-
-  void inject_uart_dependency(UART_DMA* uart) {
-    uart_ = uart;
+  CommandDispatcher(UART_DMA* uart) : uart_(uart) {
   }
+
+  void input_char(char c);
 
 private:
   void send_ack(int);
   void send_err(int);
 
-  UART_DMA* uart_{ nullptr };
+  UART_DMA* const uart_{ nullptr };
 
-  using cmd_fcn_ptr = void (*)();
+  using cmd_fcn_ptr = void (CommandDispatcher::*)();
   cmd_fcn_ptr get_fcn_from_cmd() const;
   cmd_fcn_ptr search_T_code() const;
   cmd_fcn_ptr search_A_code() const;

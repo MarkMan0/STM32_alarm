@@ -20,13 +20,6 @@
 #include "globals.h"
 
 
-void CommandDispatcher::T100() {
-  uart2.println("T100");
-  HAL_Delay(3000);
-  uart2.println("T100_done");
-}
-
-
 void SystemClock_Config(void);
 
 
@@ -35,7 +28,7 @@ RTOS_I2C i2c;
 DS3231 rtc(i2c);
 SSD1306 display(i2c);
 GFX gfx;
-CommandDispatcher cmd;
+CommandDispatcher cmd(&uart2);
 
 static void led_task(void*) {
   pin_mode(pins::led, pin_mode_t::OUT_PP);
@@ -58,7 +51,6 @@ int main(void) {
   i2c.init_i2c1();
   display.begin();
   gfx.insert_ssd1306_dependency(&display);
-  cmd.inject_uart_dependency(&uart2);
 
   TaskHandle_t led_handle, uart2_handle, display_handle;
   xTaskCreate(led_task, "blink task", 64, nullptr, osPriorityNormal, &led_handle);
