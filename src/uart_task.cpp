@@ -24,7 +24,7 @@ void uart_task(void*) {
       strncat(buff.data(), "\"", buff.size() - 1);
       strncat(buff.data(), "\n", buff.size() - 1);
 
-      uart2.send(buff.data());
+      uart2.printf("%s", buff.data());
     }
   }
 }

@@ -7,7 +7,7 @@
 #include "pin_api.h"
 #include <algorithm>
 #include "utils.h"
-
+#include "nanoprintf.h"
 
 void UART_DMA::generic_tx_task(void* ptr) {
   UART_DMA& uart = *reinterpret_cast<UART_DMA*>(ptr);
@@ -65,11 +65,11 @@ void UART_DMA::tick() {
 
 
 uint16_t UART_DMA::vprintf(const char* fmt, va_list args) {
-  auto msglen = vsnprintf(nullptr, 0, fmt, args);
+  auto msglen = npf_vsnprintf(nullptr, 0, fmt, args);
 
   utils::Lock lck(tx_buff_mtx_);
 
-  auto ptr = transmit_buff_.reserve(msglen + 1);
+  uint8_t* ptr = transmit_buff_.reserve(msglen + 1);
   if (!ptr) {
     flush();
     transmit_buff_.reset();
@@ -80,7 +80,10 @@ uint16_t UART_DMA::vprintf(const char* fmt, va_list args) {
     return 0;
   }
 
-  return vsnprintf(reinterpret_cast<char*>(ptr), msglen + 1, fmt, args);
+  int written = npf_vsnprintf(reinterpret_cast<char*>(ptr), msglen + 1, fmt, args);
+  transmit_buff_.head_ = transmit_buff_.decrement_idx(transmit_buff_.head_);  // final \0 is ignored/not sent
+
+  return written;
 }
 
 void UART_DMA::reset_buffers() {

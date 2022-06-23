@@ -17,7 +17,6 @@ void UART_DMA::rx_event_cb(UART_HandleTypeDef* huart, uint16_t pos) {
 
   last_rxdma_pos_ = (num_received + last_rxdma_pos_) % dma_buff_.size();
 
-  assert_param(rx_notify_task_ != nullptr);
   if (rx_notify_task_ != nullptr) {
     xTaskNotifyFromISR(rx_notify_task_, 0, eNoAction, nullptr);
   }

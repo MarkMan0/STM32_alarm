@@ -1,12 +1,12 @@
 #include "uart_tests.h"
-
+#include "nanoprintf.h"
 #include <unity.h>
 
 void setUp() {
 }
 void tearDown() {
   uart1.flush();
-  HAL_Delay(500);
+  osDelay(pdMS_TO_TICKS(500));
   while (uart1.available()) {
     UNUSED(uart1.get_one());
   }
@@ -71,8 +71,7 @@ void test_send_data() {
   S s1{ 568, true, -3.14 };
 
   uart1.send(&s1, sizeof(s1));
-  uart1.flush();
-  HAL_Delay(500);
+  osDelay(pdMS_TO_TICKS(200));
 
   TEST_ASSERT_EQUAL(sizeof(s1), uart1.available());
   uint8_t rec[30];
@@ -91,11 +90,11 @@ void test_printf() {
   const int i = -434;
   const float f = 3.1415;
   char expected[50];
-  int len = snprintf(expected, 50, fmt, str, i, f);
+  int len = npf_snprintf(expected, 50, fmt, str, i, f);
 
   int len2 = uart1.printf(fmt, str, i, f);
-  uart1.flush();
-  HAL_Delay(1000);
+  osDelay(pdMS_TO_TICKS(200));
+
   char result[50]{};
   for (int i = 0; i < 50 && uart1.available(); ++i) {
     result[i] = uart1.get_one();
@@ -109,27 +108,25 @@ void test_printf() {
 
 void test_printf_overflow() {
   uart1.printf("%060d", 0);
-  uart1.flush();
-  HAL_Delay(100);
+  osDelay(pdMS_TO_TICKS(200));
   int cnt = 0;
   while (uart1.available()) {
     char c = uart1.get_one();
-    TEST_ASSERT_TRUE(c == '0' || c == '\0');
+    TEST_ASSERT_TRUE(c == '0');
     ++cnt;
   }
-  TEST_ASSERT_EQUAL(61, cnt);
+  TEST_ASSERT_EQUAL(60, cnt);
 
 
   TEST_ASSERT_EQUAL(10, uart1.printf("HHHHHHHHHH"));
-  uart1.flush();
-  HAL_Delay(100);
+  osDelay(pdMS_TO_TICKS(200));
   cnt = 0;
   while (uart1.available()) {
     char c = uart1.get_one();
-    TEST_ASSERT_TRUE(c == 'H' || c == '\0');
+    TEST_ASSERT_TRUE(c == 'H');
     ++cnt;
   }
-  TEST_ASSERT_EQUAL(11, cnt);
+  TEST_ASSERT_EQUAL(10, cnt);
 }
 
 

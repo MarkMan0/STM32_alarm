@@ -74,10 +74,13 @@ public:
   /// @details Messages are placed directly into the TX buffer
   /// If not enough place in buffer, transmits nothing
   uint16_t printf(const char* fmt, ...) {
-    va_list args;
+    std::va_list args;
     va_start(args, fmt);
     const auto res = this->vprintf(fmt, args);
     va_end(args);
+    if (res) {
+      xTaskNotify(tx_task_, 0, eNoAction);
+    }
     return res;
   }
   /// @brief Flush the transmission buffer
@@ -105,7 +108,7 @@ private:
 
   SemaphoreHandle_t tx_buff_mtx_;  ///< Mutex to lock the receive buffer
 
-  TaskHandle_t tx_task_;  ///< Handle to task that calls tick()
+  TaskHandle_t tx_task_{ nullptr };  ///< Handle to task that calls tick()
 
   TaskHandle_t rx_notify_task_{ nullptr };  ///< Task that will be notified on RX
 
