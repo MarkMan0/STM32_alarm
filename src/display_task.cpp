@@ -7,9 +7,6 @@
 #include "DS3231.h"
 #include <array>
 
-GFX gfx;
-SSD1306 display(i2c);
-DS3231 rtc(i2c);
 
 static std::array<char, 15> time_str;
 

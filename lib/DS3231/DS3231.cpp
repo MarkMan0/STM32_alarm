@@ -103,7 +103,7 @@ bool DS3231::get_time(time& t) {
   t.month = (buff[5] & MASK_MONTH) + 10 * (!!(buff[5] & MASK_10_MONTH));
   t.year = 2000 + (buff[6] & MASK_YEAR) + 10 * ((buff[6] & MASK_10_YEAR) >> 4);
 
-
+  t.dow_str = dow_to_str(t.dow);
   return true;
 }
 
@@ -157,4 +157,18 @@ bool DS3231::set_time(const time& t) {
   buff[6] |= (t.year % 10) & MASK_YEAR;
 
   return i2c_dev_.write_register(i2c_address_, SECONDS, buff, 7);
+}
+
+
+const char* DS3231::dow_to_str(uint8_t dow) const {
+  static constexpr const char* lookup[] = {
+    "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+  };
+  static constexpr const char* empty = "";
+
+  if (not utils::within(dow, 1, 7)) {
+    return empty;
+  }
+
+  return lookup[dow - 1];
 }

@@ -20,16 +20,6 @@
 #include "globals.h"
 
 
-void CommandDispatcher::A0() {
-  uart2.println("A0");
-  HAL_Delay(3000);
-  uart2.println("A0_done");
-}
-void CommandDispatcher::A1() {
-  uart2.println("A1");
-  HAL_Delay(3000);
-  uart2.println("A1_done");
-}
 void CommandDispatcher::T100() {
   uart2.println("T100");
   HAL_Delay(3000);
@@ -42,6 +32,10 @@ void SystemClock_Config(void);
 
 UART_DMA uart2(UART_DMA::uart2_hw_init, UART_DMA::uart2_enable_isrs);
 RTOS_I2C i2c;
+DS3231 rtc(i2c);
+SSD1306 display(i2c);
+GFX gfx;
+CommandDispatcher cmd;
 
 static void led_task(void*) {
   pin_mode(pins::led, pin_mode_t::OUT_PP);
@@ -64,11 +58,12 @@ int main(void) {
   i2c.init_i2c1();
   display.begin();
   gfx.insert_ssd1306_dependency(&display);
+  cmd.inject_uart_dependency(&uart2);
 
   TaskHandle_t led_handle, uart2_handle, display_handle;
-  // xTaskCreate(led_task, "blink task", 64, nullptr, osPriorityNormal, &led_handle);
-  xTaskCreate(uart_task, "uart2 RX task", 64, nullptr, osPriorityNormal, &uart2_handle);
-  // xTaskCreate(display_task, "display task", 128, nullptr, osPriorityNormal, &display_handle);
+  xTaskCreate(led_task, "blink task", 64, nullptr, osPriorityNormal, &led_handle);
+  xTaskCreate(uart_task, "uart2 RX task", 128, nullptr, osPriorityNormal, &uart2_handle);
+  xTaskCreate(display_task, "display task", 128, nullptr, osPriorityNormal, &display_handle);
 
   uart2.register_task_to_notify_on_rx(uart2_handle);
 
