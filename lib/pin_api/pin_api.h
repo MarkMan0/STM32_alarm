@@ -31,6 +31,15 @@ enum class pin_mode_t {
   OUT_OD,
   OUT_OD_PU,
   ANALOG,
+  IT_RISING,
+  IT_RISING_PU,
+  IT_RISING_PD,
+  IT_FALLING,
+  IT_FALLING_PU,
+  IT_FALLING_PD,
+  IT_RISE_FALL,
+  IT_RISE_FALL_PU,
+  IT_RISE_FALL_PD,
   ANALOG_PU,
   ANALOG_PD,
   ALTERNATE_PP,
@@ -124,11 +133,17 @@ namespace pin_api {
         return GPIO_NOPULL;
       case pin_mode_t::ANALOG_PD:
       case pin_mode_t::INPUT_PD:
+      case pin_mode_t::IT_RISING_PD:
+      case pin_mode_t::IT_FALLING_PD:
+      case pin_mode_t::IT_RISE_FALL_PD:
         return GPIO_PULLDOWN;
       case pin_mode_t::ALTERNATE_OD_PU:
       case pin_mode_t::ANALOG_PU:
       case pin_mode_t::OUT_OD_PU:
       case pin_mode_t::INPUT_PU:
+      case pin_mode_t::IT_RISING_PU:
+      case pin_mode_t::IT_FALLING_PU:
+      case pin_mode_t::IT_RISE_FALL_PU:
         return GPIO_PULLUP;
     }
   }
@@ -237,6 +252,34 @@ namespace pin_api {
     HAL_GPIO_Init(pin_name_to_port(pin), &gpio);
   }
 
+  inline void init_pin_IT(const pin_name pin, const pin_mode_t mode) {
+    GPIO_InitTypeDef gpio{ .Pin = pin_name_to_num(pin),
+                           .Mode = GPIO_MODE_INPUT,
+                           .Pull = get_pull_type(mode),
+                           .Speed = GPIO_SPEED_FREQ_MEDIUM,
+                           .Alternate = 0 };
+
+    switch (mode) {
+      case pin_mode_t::IT_FALLING:
+      case pin_mode_t::IT_FALLING_PU:
+      case pin_mode_t::IT_FALLING_PD:
+        gpio.Mode = GPIO_MODE_IT_FALLING;
+        break;
+      case pin_mode_t::IT_RISING:
+      case pin_mode_t::IT_RISING_PU:
+      case pin_mode_t::IT_RISING_PD:
+        gpio.Mode = GPIO_MODE_IT_RISING;
+        break;
+      case pin_mode_t::IT_RISE_FALL:
+      case pin_mode_t::IT_RISE_FALL_PU:
+      case pin_mode_t::IT_RISE_FALL_PD:
+        gpio.Mode = GPIO_MODE_IT_RISING_FALLING;
+      default:
+        break;
+    }
+    HAL_GPIO_Init(pin_name_to_port(pin), &gpio);
+  }
+
   /// @}
 }  // namespace pin_api
 
@@ -275,6 +318,18 @@ inline void pin_mode(const pin_name pin, const pin_mode_t mode, const uint16_t a
     case pin_mode_t::ALTERNATE_PP:
       pin_api::init_pin_alternate(pin, mode, alternate);
       break;
+
+    case pin_mode_t::IT_FALLING:
+    case pin_mode_t::IT_FALLING_PU:
+    case pin_mode_t::IT_FALLING_PD:
+    case pin_mode_t::IT_RISING:
+    case pin_mode_t::IT_RISING_PU:
+    case pin_mode_t::IT_RISING_PD:
+    case pin_mode_t::IT_RISE_FALL:
+    case pin_mode_t::IT_RISE_FALL_PU:
+    case pin_mode_t::IT_RISE_FALL_PD:
+      pin_api::init_pin_IT(pin, mode);
+      break;
   }
 }
 
@@ -311,5 +366,6 @@ inline void deinit_pin(const pin_name pin) {
 
 /// @brief pin aliases
 namespace pins {
-  inline constexpr auto rx = PA15, tx = PA2, led = PB3, rx1 = PA10, tx1 = PA9, sda1 = PB7, scl1 = PB6;
+  inline constexpr auto rx = PA15, tx = PA2, led = PB3, rx1 = PA10, tx1 = PA9, sda1 = PB7, scl1 = PB6, enc_A = PA4,
+                        enc_B = PA5, enc_SW = PA1;
 }  // namespace pins
