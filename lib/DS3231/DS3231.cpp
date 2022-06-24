@@ -284,6 +284,7 @@ uint8_t DS3231::set_alarm(int n, const alarm_t& t) {
 
   if (t.en) {
     cntrl |= flag_ie;
+    cntrl |= MASK_INTCN;
   } else {
     cntrl &= ~flag_ie;
   }
@@ -327,6 +328,31 @@ uint8_t DS3231::get_alarm(int n, alarm_t& t) {
     t.en = cfg & 1;
   } else {
     t.en = cfg & 2;
+  }
+
+  return 0;
+}
+
+uint8_t DS3231::get_and_clear_alarm_flag(int n, bool& b) {
+  assert_param(n == 0 || n == 1);
+
+  uint8_t stat{};
+  if (not i2c_dev_.read_register(i2c_address_, reg::CONTROL_STATUS, &stat, 1)) {
+    return 1;
+  }
+
+  if (n == 0) {
+    b = stat & MASK_A1F;
+    stat &= ~MASK_A1F;
+  } else if (n == 1) {
+    b = stat & MASK_A2F;
+    stat &= ~MASK_A2F;
+  } else {
+    b = false;
+  }
+
+  if (not i2c_dev_.write_register(i2c_address_, reg::CONTROL_STATUS, &stat, 1)) {
+    return 2;
   }
 
   return 0;

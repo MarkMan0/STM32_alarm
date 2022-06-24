@@ -367,5 +367,5 @@ inline void deinit_pin(const pin_name pin) {
 /// @brief pin aliases
 namespace pins {
   inline constexpr auto rx = PA15, tx = PA2, led = PB3, rx1 = PA10, tx1 = PA9, sda1 = PB7, scl1 = PB6, enc_A = PA4,
-                        enc_B = PA5, enc_SW = PA1;
+                        enc_B = PA5, enc_SW = PA1, alarm_it = PA6;
 }  // namespace pins

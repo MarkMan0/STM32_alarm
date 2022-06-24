@@ -56,13 +56,9 @@ public:
   [[nodiscard]] uint8_t set_alarm(int, const alarm_t&);
   [[nodiscard]] uint8_t get_alarm(int, alarm_t&);
 
+  [[nodiscard]] uint8_t get_and_clear_alarm_flag(int, bool&);
 
 private:
-  /*[[nodiscard]] bool set_alarm_1(const alarm_t&);
-  [[nodiscard]] bool set_alarm_2(const alarm_t&);
-  [[nodiscard]] bool get_alarm_1(alarm_t&);
-  [[nodiscard]] bool get_alarm_2(alarm_t&);*/
-
   static inline constexpr uint8_t i2c_address_{ 0b1101000 << 1 };
   const char* dow_to_str(uint8_t dow) const;
   I2C& i2c_dev_;
