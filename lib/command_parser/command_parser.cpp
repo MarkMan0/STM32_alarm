@@ -103,6 +103,10 @@ CommandDispatcher::cmd_fcn_ptr CommandDispatcher::search_A_code() const {
       return &CommandDispatcher::A0;
     case 1:
       return &CommandDispatcher::A1;
+    case 2:
+      return &CommandDispatcher::A2;
+    case 3:
+      return &CommandDispatcher::A3;
 
     default:
       return nullptr;

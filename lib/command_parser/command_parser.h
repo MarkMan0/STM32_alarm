@@ -66,6 +66,8 @@ public:
   void T100();  ///< test command, does nothing
   void A0();    ///< request time from RTC
   void A1();    ///< set RTC time
+  void A2();    ///< set alarm
+  void A3();    ///< get alarm
   /// @}
 
   CommandDispatcher(UART_DMA* uart) : uart_(uart) {

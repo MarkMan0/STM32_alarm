@@ -1,9 +1,15 @@
 #include "command_parser.h"
 
 
-__weak void CommandDispatcher::A0() {
-}
-__weak void CommandDispatcher::A1() {
-}
-__weak void CommandDispatcher::T100() {
-}
+#define DECLARE_WEAK_COMMAND(F)                                                                                        \
+  __weak void CommandDispatcher::F() {                                                                                 \
+  }
+
+
+DECLARE_WEAK_COMMAND(A0);
+DECLARE_WEAK_COMMAND(A1);
+DECLARE_WEAK_COMMAND(A2);
+DECLARE_WEAK_COMMAND(A3);
+
+
+DECLARE_WEAK_COMMAND(T100);

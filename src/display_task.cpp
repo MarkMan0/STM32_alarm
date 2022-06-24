@@ -13,7 +13,7 @@ static std::array<char, 15> time_str;
 void display_task(void* ptr_in) {
   while (1) {
     DS3231::time t;
-    if (rtc.get_time(t)) {
+    if (0 == rtc.get_time(t)) {
       constexpr char fmt[] = "%02d:%02d:%02d";
       int len = snprintf(time_str.data(), time_str.size(), fmt, t.hour, t.min, t.sec);
       ++len;
