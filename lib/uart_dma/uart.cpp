@@ -27,7 +27,7 @@ void UART_DMA::begin(uint32_t baud) {
 
   tx_buff_mtx_ = xSemaphoreCreateBinary();
   xSemaphoreGive(tx_buff_mtx_);
-  xTaskCreate(generic_tx_task, "tx task", 128, this, osPriorityAboveNormal1, &tx_task_);
+  xTaskCreate(generic_tx_task, "tx task", 128, this, 20, &tx_task_);
 
 
   HAL_UART_Receive_DMA(&huart_, dma_buff_.buff_.data(), dma_buff_.buff_.size());
@@ -52,7 +52,7 @@ void UART_DMA::flush() {
         transmit_buff_.pop(n);
         break;
       }
-      osDelay(pdMS_TO_TICKS(10));
+      vTaskDelay(pdMS_TO_TICKS(10));
     }
   }
 }

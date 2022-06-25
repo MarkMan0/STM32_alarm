@@ -1,5 +1,4 @@
 #include "FreeRTOS.h"
-#include "cmsis_os2.h"
 #include "GFX.h"
 #include "SSD1306.h"
 #include "rtos_i2c.h"
@@ -24,6 +23,6 @@ void display_task(void* ptr_in) {
       gfx.draw();
     }
 
-    osDelay(pdMS_TO_TICKS(1000));
+    vTaskDelay(pdMS_TO_TICKS(1000));
   }
 }

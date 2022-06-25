@@ -8,7 +8,6 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "task.h"
-#include "cmsis_os2.h"
 #include "utils.h"
 
 

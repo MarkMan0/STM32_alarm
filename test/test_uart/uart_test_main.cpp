@@ -1,6 +1,4 @@
-
 #include "../main.h"
-#include "cmsis_os.h"
 #include "uart_tests.h"
 #include <unity.h>
 

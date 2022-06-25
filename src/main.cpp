@@ -11,7 +11,6 @@
 #include "uart.h"
 #include <array>
 #include "FreeRTOS.h"
-#include "cmsis_os2.h"
 #include "GFX.h"
 #include "rtos_i2c.h"
 #include "display_task.h"
@@ -34,32 +33,32 @@ static void led_task(void*) {
   pin_mode(pins::led, pin_mode_t::OUT_PP);
   while (1) {
     toggle_pin(pins::led);
-    osDelay(pdMS_TO_TICKS(500));
+    vTaskDelay(pdMS_TO_TICKS(500));
   }
 }
 
-
-
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char* pcTaskName) {
+  assert_param(0);
+}
 
 int main(void) {
   HAL_Init();
   SystemClock_Config();
 
-  osKernelInitialize();
-
+  HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
   uart2.begin(115200);
   i2c.init_i2c1();
   display.begin();
   gfx.insert_ssd1306_dependency(&display);
 
   TaskHandle_t led_handle, uart2_handle, display_handle;
-  xTaskCreate(led_task, "blink task", 64, nullptr, osPriorityNormal, &led_handle);
-  xTaskCreate(uart_task, "uart2 RX task", 128, nullptr, osPriorityNormal, &uart2_handle);
-  xTaskCreate(display_task, "display task", 128, nullptr, osPriorityNormal, &display_handle);
+  xTaskCreate(led_task, "blink task", 128, nullptr, 20, &led_handle);
+  xTaskCreate(uart_task, "uart2 RX task", 128, nullptr, 20, &uart2_handle);
+  xTaskCreate(display_task, "display task", 128, nullptr, 20, &display_handle);
 
-  uart2.register_task_to_notify_on_rx(uart2_handle);
+  // uart2.register_task_to_notify_on_rx(uart2_handle);
 
-  osKernelStart();
+  vTaskStartScheduler();
   while (1) {
   }
 }
@@ -122,9 +121,11 @@ void Error_Handler(void) {
  */
 void assert_failed(uint8_t* file, uint32_t line) {
   volatile bool b = true;
+  portDISABLE_INTERRUPTS();
   while (b) {
     HAL_Delay(1000);
   }
+  portENABLE_INTERRUPTS();
 }
 #endif /* USE_FULL_ASSERT */
 

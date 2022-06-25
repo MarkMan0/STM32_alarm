@@ -1,5 +1,4 @@
 #include "FreeRTOS.h"
-#include "cmsis_os2.h"
 #include "GFX.h"
 #include <unity.h>
 #include "rtos_i2c.h"

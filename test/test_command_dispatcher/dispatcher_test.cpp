@@ -1,5 +1,4 @@
 #include "uart.h"
-#include "cmsis_os2.h"
 #include "task.h"
 #include "command_parser.h"
 #include "unity.h"
@@ -28,7 +27,7 @@ static void uart_task(void*) {
 
 void pre_test() {
   uart1.begin(115200);
-  xTaskCreate(uart_task, "uart1 task", 128, nullptr, osPriorityNormal1, &uart_handle);
+  xTaskCreate(uart_task, "uart1 task", 128, nullptr, 10, &uart_handle);
   uart1.register_task_to_notify_on_rx(uart_handle);
 }
 
@@ -41,7 +40,7 @@ void tearDown() {
 void test_command_called() {
   glob_val = 0;
   uart1.printf("T100\n");
-  osDelay(pdMS_TO_TICKS(200));
+  vTaskDelay(pdMS_TO_TICKS(200));
   TEST_ASSERT_EQUAL(1, glob_val);
 }
 

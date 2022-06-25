@@ -1,7 +1,6 @@
 #include "main.h"
 
 #include "FreeRTOS.h"
-#include "cmsis_os2.h"
 #include "task.h"
 #include "unity.h"
 
@@ -17,16 +16,19 @@ int main() {
 
   HAL_Delay(1000);
 
-  osKernelInitialize();
+  HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
   pre_test();
 
   TaskHandle_t handle;
-  xTaskCreate(test_task, "test task", 128, nullptr, osPriorityNormal, &handle);
+  xTaskCreate(test_task, "test task", 128, nullptr, 10, &handle);
 
-  osKernelStart();
+  vTaskStartScheduler();
 }
 
 
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char* pcTaskName) {
+  assert_param(0);
+}
 __attribute__((weak)) void pre_test() {
 }
 

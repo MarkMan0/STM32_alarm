@@ -6,7 +6,7 @@ void setUp() {
 }
 void tearDown() {
   uart1.flush();
-  osDelay(pdMS_TO_TICKS(500));
+  vTaskDelay(pdMS_TO_TICKS(500));
   while (uart1.available()) {
     UNUSED(uart1.get_one());
   }
@@ -71,7 +71,7 @@ void test_send_data() {
   S s1{ 568, true, -3.14 };
 
   uart1.send(&s1, sizeof(s1));
-  osDelay(pdMS_TO_TICKS(200));
+  vTaskDelay(pdMS_TO_TICKS(200));
 
   TEST_ASSERT_EQUAL(sizeof(s1), uart1.available());
   uint8_t rec[30];
@@ -93,7 +93,7 @@ void test_printf() {
   int len = npf_snprintf(expected, 50, fmt, str, i, f);
 
   int len2 = uart1.printf(fmt, str, i, f);
-  osDelay(pdMS_TO_TICKS(200));
+  vTaskDelay(pdMS_TO_TICKS(200));
 
   char result[50]{};
   for (int i = 0; i < 50 && uart1.available(); ++i) {
@@ -108,7 +108,7 @@ void test_printf() {
 
 void test_printf_overflow() {
   uart1.printf("%060d", 0);
-  osDelay(pdMS_TO_TICKS(200));
+  vTaskDelay(pdMS_TO_TICKS(200));
   int cnt = 0;
   while (uart1.available()) {
     char c = uart1.get_one();
@@ -119,7 +119,7 @@ void test_printf_overflow() {
 
 
   TEST_ASSERT_EQUAL(10, uart1.printf("HHHHHHHHHH"));
-  osDelay(pdMS_TO_TICKS(200));
+  vTaskDelay(pdMS_TO_TICKS(200));
   cnt = 0;
   while (uart1.available()) {
     char c = uart1.get_one();
