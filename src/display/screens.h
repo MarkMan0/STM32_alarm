@@ -5,15 +5,44 @@
 
 
 class MainScreen : public AbstractScreen {
+public:
   // void onEntry() override;
   void draw() override;
-  void onClickUp() override;
+  bool onClickUp() override;
   // void onEncoder(int32_t) override;
 };
 
-class Screen2 : public AbstractScreen {
+class MainMenuScreen : public AbstractScreen {
+public:
   void draw() override;
-  void onClickUp() override;
+  void onEncoder(int32_t) override;
+  bool onClickUp() override;
+
+private:
+  static constexpr const char* menu_items[] = { "Back", "Screen 2", "Screen 3", "Screen 4" };
+  static constexpr unsigned num_items = sizeof(menu_items) / sizeof(menu_items[0]);
+
+  unsigned current_item_ = 0;
+};
+
+class Screen2 : public AbstractScreen {
+public:
+  void draw() override;
+  bool onClickUp() override;
+  bool onClickHeld() override;
+
+private:
+  unsigned counter_ = 0;
+};
+class Screen3 : public AbstractScreen {
+public:
+  void draw() override;
+  bool onClickUp() override;
+};
+class Screen4 : public AbstractScreen {
+public:
+  void draw() override;
+  bool onClickUp() override;
 };
 
 
@@ -21,8 +50,8 @@ class Screen2 : public AbstractScreen {
 
 class ScreenAllocator {
 public:
-  using screen_collection_t = std::variant<MainScreen, Screen2>;
-
+  using screen_collection_t = std::variant<MainScreen, MainMenuScreen, Screen2, Screen3, Screen4>;
+  int i = sizeof(MainScreen);
   template <class T>
   static AbstractScreen* allocate(const T& t) {
     AbstractScreen* ptr;

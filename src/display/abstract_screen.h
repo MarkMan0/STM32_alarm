@@ -8,11 +8,14 @@ public:
   }
   virtual void onExit() {
   }
-  virtual void onClickDown() {
+  virtual bool onClickDown() {
+    return false;
   }
-  virtual void onClickHeld() {
+  virtual bool onClickHeld() {
+    return false;
   }
-  virtual void onClickUp() {
+  virtual bool onClickUp() {
+    return false;
   }
 
   virtual void onEncoder(int32_t) {

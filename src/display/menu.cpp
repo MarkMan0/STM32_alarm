@@ -30,10 +30,13 @@ void Menu::tick() {
       curr_screen_->onClickDown();
       break;
     case e::RELEASED:
-      curr_screen_->onClickUp();
+      if (not held_handled_) {
+        curr_screen_->onClickUp();
+      }
+      held_handled_ = false;
       break;
     case e::HELD:
-      curr_screen_->onClickHeld();
+      held_handled_ = curr_screen_->onClickHeld();
       break;
   }
 

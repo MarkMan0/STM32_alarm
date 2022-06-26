@@ -20,4 +20,5 @@ private:
   AbstractScreen* curr_screen_;
   AbstractScreen* next_screen_;
   int32_t last_encoder_{ 0 };
+  bool held_handled_ = false;
 };
