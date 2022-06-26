@@ -94,9 +94,9 @@ public:
             return btn_event_t::RELEASED;
           } else {
             tracker_state_ = BTN_DOWN;  // false signal / noise
-            return btn_event_t::HELD;
           }
         }
+        return btn_event_t::HELD;
         break;
       }
     }

@@ -71,3 +71,19 @@ void TIM7_DAC2_IRQHandler(void) {
   extern TIM_HandleTypeDef htim7;
   HAL_TIM_IRQHandler(&htim7);
 }
+
+void EXTI4_IRQHandler(void) {
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
+  GPIOStateContainer gpio{ 0 };
+  gpio.pin_A = 2 | read_pin(pins::enc_A);
+  gpio.pin_B = 2 | read_pin(pins::enc_B);
+  xQueueSendFromISR(gpio_queue, &gpio, NULL);
+}
+
+
+void EXTI1_IRQHandler(void) {
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_1);
+  GPIOStateContainer gpio{ 0 };
+  gpio.pin_SW = 2 | read_pin(pins::enc_SW);
+  xQueueSendFromISR(gpio_queue, &gpio, NULL);
+}

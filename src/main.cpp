@@ -18,6 +18,7 @@
 #include "command_parser.h"
 #include "globals.h"
 #include "encoder.h"
+#include "queue.h"
 
 void SystemClock_Config(void);
 
@@ -28,28 +29,45 @@ DS3231 rtc(i2c);
 SSD1306 display(i2c);
 GFX gfx;
 CommandDispatcher cmd(&uart2);
+RotaryEncoder encoder;
+QueueHandle_t gpio_queue;
+
+
+const char* btn_state(btn_event_t ev) {
+  static const char *NONE = "NONE", *PRESSED = "PRESSED", *HELD = "HELD", *RELEASED = "RELEASED";
+
+  switch (ev) {
+    case btn_event_t::NONE:
+      return NONE;
+    case btn_event_t::PRESSED:
+      return PRESSED;
+    case btn_event_t::HELD:
+      return HELD;
+    case btn_event_t::RELEASED:
+      return RELEASED;
+  }
+}
 
 static void led_task(void*) {
-  pin_mode(pins::led, pin_mode_t::OUT_PP);
-  pin_mode(pins::enc_A, pin_mode_t::INPUT_PU);
-  pin_mode(pins::enc_B, pin_mode_t::INPUT_PU);
-
-  Encoder enc;
-  enc.init(read_pin(pins::enc_A));
-  bool last_sw_state = true;
+  GPIOStateContainer cont{ 0 };
   while (1) {
-    bool a = read_pin(pins::enc_A), b = read_pin(pins::enc_B), sw = read_pin(pins::enc_SW);
-
-    if (enc.update(a, b)) {
-      uart2.printf("CNT: %d\n", enc.get());
+    if (pdPASS != xQueueReceive(gpio_queue, &cont, portMAX_DELAY)) {
+      continue;
     }
-    if (last_sw_state && not sw) {
-      uart2.printf("SW pressed\n");
-      enc.reset();
+    bool print = false;
+    if (cont.pin_A & 2 && cont.pin_B & 2) {
+      // uart2.printf("%d\t%d\n", cont.pin_A & 1, cont.pin_B & 1);
+      bool b = encoder.enc.update(cont.pin_A & 1, cont.pin_B & 1);
+      print = print | b;
     }
-    last_sw_state = sw;
 
-    vTaskDelay(pdMS_TO_TICKS(10));
+    if (cont.pin_SW & 2) {
+      encoder.btn.update_btn(cont.pin_SW & 1);
+      print = true;
+    }
+    if (print) {
+      uart2.printf("%d\n", encoder.enc.get());
+    }
   }
 }
 
@@ -100,10 +118,24 @@ int main(void) {
   display.begin();
   gfx.insert_ssd1306_dependency(&display);
 
+  pin_mode(pins::enc_A, pin_mode_t::IT_RISE_FALL_PU);
+  pin_mode(pins::enc_B, pin_mode_t::INPUT_PU);
+  pin_mode(pins::enc_SW, pin_mode_t::IT_RISE_FALL_PU);
+
+
+  HAL_NVIC_SetPriority(EXTI1_IRQn, 6, 0);
+  HAL_NVIC_EnableIRQ(EXTI1_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI4_IRQn, 6, 0);
+  HAL_NVIC_EnableIRQ(EXTI4_IRQn);
+
+
   TaskHandle_t led_handle, uart2_handle, display_handle;
   xTaskCreate(led_task, "blink task", 128, nullptr, 20, &led_handle);
   xTaskCreate(uart_task, "uart2 RX task", 128, nullptr, 20, &uart2_handle);
   xTaskCreate(display_task, "display task", 150, nullptr, 20, &display_handle);
+
+  gpio_queue = xQueueCreate(10, sizeof(GPIOStateContainer));
 
   uart2.register_task_to_notify_on_rx(uart2_handle);
 

@@ -84,7 +84,7 @@ void set_and_test(pin_name p, uint8_t exp) {
 
 
 void test_multiple_pins() {
-  auto p1 = PB3, p2 = PA4;
+  auto p1 = pin_labels::D10, p2 = pin_labels::D11;
 
   pin_mode(p1, pin_mode_t::OUT_PP);
   pin_mode(p2, pin_mode_t::OUT_PP);
