@@ -7,7 +7,6 @@
 #include <array>
 
 Menu menu;
-static std::array<char, 15> time_str;
 
 void display_task(void* ptr_in) {
   menu.init();

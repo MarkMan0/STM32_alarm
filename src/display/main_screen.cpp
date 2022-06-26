@@ -2,11 +2,41 @@
 #include "display_task.h"
 #include "globals.h"
 
-
+static std::array<char, 15> time_str;
 void MainScreen::draw() {
   gfx.clear_canvas();
+  gfx.move_cursor({ 0, 0 });
+  DS3231::time t;
+  if (0 == rtc.get_time(t)) {
+    constexpr char fmt[] = "%02d:%02d:%02d";
+    int len = snprintf(time_str.data(), time_str.size(), fmt, t.hour, t.min, t.sec);
+    ++len;
+    len *= 8;  // width of font
+    gfx.move_cursor({ 128 - len, 0 });
+    gfx.draw_text(time_str.data());
+  } else {
+    gfx.printf("ERR rtc");
+  }
+
   gfx.move_cursor({ 0, 2 });
-  gfx.printf("Main screen");
+  for (int i = 0; i < 2; ++i) {
+    DS3231::alarm_t alarm;
+    gfx.printf("Alarm %d ", i);
+    if (0 == rtc.get_alarm(i, alarm)) {
+      if (alarm.en) {
+        gfx.printf("ON\n  ");
+        if (alarm.alarm_type == DS3231::alarm_t::DAILY) {
+          gfx.printf("*: ");
+        } else {
+          gfx.printf("%d: ", alarm.dow);
+        }
+        gfx.printf("%d:%d\n", alarm.hour, alarm.min);
+      } else {
+        gfx.printf("OFF\n");
+      }
+    }
+  }
+
   gfx.draw();
 }
 

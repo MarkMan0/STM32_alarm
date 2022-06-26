@@ -134,5 +134,5 @@ void CommandDispatcher::A3() {
     return;
   }
   uart_->printf("Alarm %d: \n\tMin: %d\n\tHour: %d\n", n, alarm.min, alarm.hour);
-  uart_->printf("\tType: %d\n\tEn: %d\n", alarm.alarm_type, alarm.en);
+  uart_->printf("\tType: %d\n\tDOW: %d\n\tEn: %d\n", alarm.alarm_type, alarm.dow, alarm.en);
 }

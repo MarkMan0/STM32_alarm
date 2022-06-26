@@ -310,6 +310,7 @@ uint8_t DS3231::get_alarm(int n, alarm_t& t) {
   auto [hour, am_pm] = hour_from_reg(buff[1]);
   t.hour = hour;
   t.am_pm = am_pm;
+  t.dow = dow_from_reg(buff[2]);
 
   const bool flag_4 = buff[2] & (1 << 7), dy_dt = buff[2] & (1 << 6);
 
