@@ -1,0 +1,23 @@
+#pragma once
+#include "abstract_screen.h"
+#include <variant>
+#include <optional>
+#include "screens.h"
+
+
+
+class Menu {
+public:
+  void init();
+  void tick();
+
+  void goto_screen(AbstractScreen* scr) {
+    next_screen_ = scr;
+  }
+
+
+private:
+  AbstractScreen* curr_screen_;
+  AbstractScreen* next_screen_;
+  int32_t last_encoder_{ 0 };
+};

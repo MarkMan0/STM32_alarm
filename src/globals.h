@@ -7,6 +7,7 @@
 #include "command_parser.h"
 #include "encoder.h"
 #include "queue.h"
+#include "display/menu.h"
 
 extern UART_DMA uart2;
 extern RTOS_I2C i2c;

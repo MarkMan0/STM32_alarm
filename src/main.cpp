@@ -32,6 +32,7 @@ CommandDispatcher cmd(&uart2);
 RotaryEncoder encoder;
 QueueHandle_t gpio_queue;
 
+static TaskHandle_t display_handle;
 
 const char* btn_state(btn_event_t ev) {
   static const char *NONE = "NONE", *PRESSED = "PRESSED", *HELD = "HELD", *RELEASED = "RELEASED";
@@ -66,7 +67,7 @@ static void led_task(void*) {
       print = true;
     }
     if (print) {
-      uart2.printf("%d\n", encoder.enc.get());
+      xTaskNotifyFromISR(display_handle, 0, eNoAction, NULL);
     }
   }
 }
@@ -122,6 +123,8 @@ int main(void) {
   pin_mode(pins::enc_B, pin_mode_t::INPUT_PU);
   pin_mode(pins::enc_SW, pin_mode_t::IT_RISE_FALL_PU);
 
+  encoder.enc.init(read_pin(pins::enc_A));
+
 
   HAL_NVIC_SetPriority(EXTI1_IRQn, 6, 0);
   HAL_NVIC_EnableIRQ(EXTI1_IRQn);
@@ -130,7 +133,7 @@ int main(void) {
   HAL_NVIC_EnableIRQ(EXTI4_IRQn);
 
 
-  TaskHandle_t led_handle, uart2_handle, display_handle;
+  TaskHandle_t led_handle, uart2_handle;
   xTaskCreate(led_task, "blink task", 128, nullptr, 20, &led_handle);
   xTaskCreate(uart_task, "uart2 RX task", 128, nullptr, 20, &uart2_handle);
   xTaskCreate(display_task, "display task", 150, nullptr, 20, &display_handle);

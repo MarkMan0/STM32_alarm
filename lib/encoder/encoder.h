@@ -77,6 +77,9 @@ public:
           tracker_state_ = BTN_DOWN;
           return btn_event_t::HELD;
         }
+        if (button_state_ != DOWN_STATE) {
+          tracker_state_ = BTN_DEBOUNCE_UP;
+        }
         break;
       }
       case BTN_DOWN: {
@@ -107,7 +110,7 @@ public:
 
 private:
   static constexpr uint32_t HELD_DELAY = 300;
-  static constexpr uint32_t DEBOUNCE_DELAY = 50;
+  static constexpr uint32_t DEBOUNCE_DELAY = 5;
   static constexpr bool DOWN_STATE = PRESSED_STATE;
 
   uint32_t event_time_{};
