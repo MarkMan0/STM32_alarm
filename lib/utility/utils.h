@@ -66,4 +66,9 @@ namespace utils {
   inline constexpr bool between(T val, K low, L high) {
     return (val > low) && (val < high);
   }
+
+  inline constexpr bool elapsed(uint32_t now, uint32_t next) {
+    return static_cast<int32_t>(now - next) >= 0;
+  }
+
 }  // namespace utils
