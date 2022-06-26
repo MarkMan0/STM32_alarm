@@ -17,7 +17,7 @@
 #include "uart_task.h"
 #include "command_parser.h"
 #include "globals.h"
-
+#include "encoder.h"
 
 void SystemClock_Config(void);
 
@@ -31,9 +31,25 @@ CommandDispatcher cmd(&uart2);
 
 static void led_task(void*) {
   pin_mode(pins::led, pin_mode_t::OUT_PP);
+  pin_mode(pins::enc_A, pin_mode_t::INPUT_PU);
+  pin_mode(pins::enc_B, pin_mode_t::INPUT_PU);
+
+  Encoder enc;
+  enc.init(read_pin(pins::enc_A));
+  bool last_sw_state = true;
   while (1) {
-    toggle_pin(pins::led);
-    vTaskDelay(pdMS_TO_TICKS(500));
+    bool a = read_pin(pins::enc_A), b = read_pin(pins::enc_B), sw = read_pin(pins::enc_SW);
+
+    if (enc.update(a, b)) {
+      uart2.printf("CNT: %d\n", enc.get());
+    }
+    if (last_sw_state && not sw) {
+      uart2.printf("SW pressed\n");
+      enc.reset();
+    }
+    last_sw_state = sw;
+
+    vTaskDelay(pdMS_TO_TICKS(10));
   }
 }
 

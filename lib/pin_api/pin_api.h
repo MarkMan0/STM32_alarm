@@ -1,6 +1,6 @@
 /**
  * @file pin_api.h
- * @brief Code to simplify working with pins. Wrpas HAL with low to none overhead
+ * @brief Code to simplify working with pins. Wraps HAL with low to none overhead
  */
 
 #pragma once
@@ -369,3 +369,9 @@ namespace pins {
   inline constexpr auto rx = PA15, tx = PA2, led = PB3, rx1 = PA10, tx1 = PA9, sda1 = PB7, scl1 = PB6, enc_A = PA4,
                         enc_B = PA5, enc_SW = PA1, alarm_it = PA6;
 }  // namespace pins
+
+namespace pin_labels {
+  inline constexpr auto A0 = PA0, A1 = PA1, A2 = PA3, A3 = PA4, A4 = PA5, A5 = PA6, A6 = PA7, A7 = PA2, D0 = PA10,
+                        D1 = PA9, D2 = PA12, D3 = PB0, D4 = PB7, D5 = PB6, D6 = PB1, D7 = PF0, D8 = PF1, D9 = PA8,
+                        D10 = PA11, D11 = PB5, D12 = PB4, D13 = PB3;
+}  // namespace pin_labels
