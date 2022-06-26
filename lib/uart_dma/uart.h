@@ -83,6 +83,17 @@ public:
     return res;
   }
 
+  uint16_t printf_ISR(const char* fmt, ...) {
+    std::va_list args;
+    va_start(args, fmt);
+    const auto res = this->vprintf_ISR(fmt, args);
+    va_end(args);
+    if (res) {
+      xTaskNotifyFromISR(tx_task_, 0, eNoAction, NULL);
+    }
+    return res;
+  }
+
   uint16_t println(const char* fmt, ...) {
     std::va_list args;
     va_start(args, fmt);
@@ -120,6 +131,7 @@ public:
 
 private:
   uint16_t vprintf(const char* fmt, va_list args);
+  uint16_t vprintf_ISR(const char* fmt, va_list args);
 
   SemaphoreHandle_t tx_buff_mtx_;  ///< Mutex to lock the receive buffer
 
