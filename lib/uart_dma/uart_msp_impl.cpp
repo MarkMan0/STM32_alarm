@@ -22,6 +22,11 @@ void UART_DMA::rx_event_cb(UART_HandleTypeDef* huart, uint16_t pos) {
   }
 }
 
+inline void UART_DMA::generic_tx_cplt_cb(UART_DMA& uart, UART_HandleTypeDef* huart) {
+  assert_param(&(uart.huart_) == huart);
+  uart.tx_complete_flag_ = true;
+}
+
 
 //////
 ////// UART2
@@ -106,6 +111,7 @@ void UART_DMA::uart2_hw_init(UART_DMA& uart) {
   }
 
   HAL_UART_RegisterRxEventCallback(&uart.huart_, UART_DMA::uart2_rx_event_cb);
+  HAL_UART_RegisterCallback(&uart.huart_, HAL_UART_TX_COMPLETE_CB_ID, UART_DMA::uart2_tx_cplt_cb);
 }
 
 void UART_DMA::uart2_rx_event_cb(UART_HandleTypeDef* huart, uint16_t pos) {
@@ -113,6 +119,13 @@ void UART_DMA::uart2_rx_event_cb(UART_HandleTypeDef* huart, uint16_t pos) {
   extern UART_DMA uart2;
   uart2.rx_event_cb(huart, pos);
 }
+
+
+void UART_DMA::uart2_tx_cplt_cb(UART_HandleTypeDef* huart) {
+  extern UART_DMA uart2;
+  generic_tx_cplt_cb(uart2, huart);
+}
+
 
 //////
 ////// UART1
@@ -198,10 +211,16 @@ void UART_DMA::uart1_hw_init(UART_DMA& uart) {
   }
 
   HAL_UART_RegisterRxEventCallback(&uart.huart_, UART_DMA::uart1_rx_event_cb);
+  HAL_UART_RegisterCallback(&uart.huart_, HAL_UART_TX_COMPLETE_CB_ID, UART_DMA::uart1_tx_cplt_cb);
 }
 
 void UART_DMA::uart1_rx_event_cb(UART_HandleTypeDef* huart, uint16_t pos) {
   assert_param(huart->Instance == USART1);
   extern UART_DMA uart1;
   uart1.rx_event_cb(huart, pos);
+}
+
+void UART_DMA::uart1_tx_cplt_cb(UART_HandleTypeDef* huart) {
+  extern UART_DMA uart1;
+  generic_tx_cplt_cb(uart1, huart);
 }

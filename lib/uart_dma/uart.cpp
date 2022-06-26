@@ -46,13 +46,26 @@ void UART_DMA::send(const void* buff, size_t sz) {
 }
 
 void UART_DMA::flush() {
+  int fail_cnt = 0;
+  // 1. check if we have data in buffer, and get a continuous segment of it
   while (uint16_t n = transmit_buff_.get_num_occupied_continuous()) {
-    for (int i = 0; i < 20; ++i) {
-      if (HAL_OK == HAL_UART_Transmit_DMA(&huart_, const_cast<uint8_t*>(&transmit_buff_.peek()), n)) {
-        transmit_buff_.pop(n);
-        break;
+    // 2. set transmit complete flag to false, and try to transmit
+    tx_complete_flag_ = false;
+    if (HAL_OK == HAL_UART_Transmit_DMA(&huart_, const_cast<uint8_t*>(&transmit_buff_.peek()), n)) {
+      // 3a. If started transmission, wait for it to complete. Flag will be set in callback
+      while (not tx_complete_flag_) {
+        vTaskDelay(pdMS_TO_TICKS(5));
       }
-      vTaskDelay(pdMS_TO_TICKS(10));
+      // 4a. Finally, pop the transmitted data from the buffer
+      transmit_buff_.pop(n);
+      break;
+    } else {
+      // 3b. If couldn't start transmission, wait or return after N tries
+      if (++fail_cnt < 10) {
+        vTaskDelay(pdMS_TO_TICKS(10));
+      } else {
+        return;
+      }
     }
   }
 }

@@ -127,6 +127,8 @@ private:
 
   TaskHandle_t rx_notify_task_{ nullptr };  ///< Task that will be notified on RX
 
+  volatile bool tx_complete_flag_{ true };
+
   uint32_t baudrate_{ 115200 };
   uint16_t last_rxdma_pos_{ 0 };  ///< Used in rx event callback to track DMA
 
@@ -146,6 +148,7 @@ public:
   /// @param ptr pointer to UART_DMA instance
   static void generic_tx_task(void* ptr);
 
+  static void generic_tx_cplt_cb(UART_DMA& uart, UART_HandleTypeDef* huart);
 
   /** @name UART2 init and callback functions */
   ///@{
@@ -156,6 +159,7 @@ public:
   static void uart2_enable_isrs(UART_DMA&);
   /** @brief Called by HAL on DMA or IDLE interrupt */
   static void uart2_rx_event_cb(UART_HandleTypeDef* huart, uint16_t Pos);
+  static void uart2_tx_cplt_cb(UART_HandleTypeDef* huart);
 
   ///@}
 
@@ -169,6 +173,7 @@ public:
   static void uart1_enable_isrs(UART_DMA&);
   /** @brief Called by HAL on DMA or IDLE interrupt */
   static void uart1_rx_event_cb(UART_HandleTypeDef* huart, uint16_t Pos);
+  static void uart1_tx_cplt_cb(UART_HandleTypeDef* huart);
 
   ///@}
 };
