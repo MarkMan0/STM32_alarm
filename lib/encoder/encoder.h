@@ -53,55 +53,61 @@ public:
 
   btn_event_t get_state() {
     switch (tracker_state_) {
-      case BTN_UP: {
+      // Just pressed
+      case BTN_UP:
         if (button_state_ == DOWN_STATE) {
           event_time_ = HAL_GetTick() + DEBOUNCE_DELAY;
-          tracker_state_ = BTN_DEBOUNCE_DOWN;
+          tracker_state_ = PRESS_DETECTED;
         }
         break;
-      }
-      case BTN_DEBOUNCE_DOWN: {
-        if (utils::elapsed(HAL_GetTick(), event_time_)) {
-          if (button_state_ == DOWN_STATE) {
-            tracker_state_ = BTN_WAIT_DOWN;              // actual button press
-            event_time_ += HELD_DELAY - DEBOUNCE_DELAY;  // held delay since first button detection
-            return btn_event_t::PRESSED;
-          } else {
-            tracker_state_ = BTN_UP;  // false signal / noise
-          }
+
+      // Wait and see if real press or bounce/noise
+      case PRESS_DETECTED:
+        if (button_state_ != DOWN_STATE) {
+          tracker_state_ = BTN_UP;  // debounce fail, false press
+        } else if (utils::elapsed(HAL_GetTick(), event_time_)) {
+          tracker_state_ = PRESS_WAIT_HELD;
+          event_time_ += HELD_DELAY - DEBOUNCE_DELAY;
+          return btn_event_t::PRESSED;  // debounce success
         }
         break;
-      }
-      case BTN_WAIT_DOWN: {
-        if (utils::elapsed(HAL_GetTick(), event_time_)) {
-          tracker_state_ = BTN_DOWN;
+
+      // Real press, wait until reporting held
+      case PRESS_WAIT_HELD:
+        if (button_state_ != DOWN_STATE) {
+          event_time_ = HAL_GetTick() + DEBOUNCE_DELAY;
+          tracker_state_ = RELEASE_DETECTED_NO_HELD;
+        } else if (utils::elapsed(HAL_GetTick(), event_time_)) {
+          tracker_state_ = BTN_HELD;
           return btn_event_t::HELD;
         }
-        if (button_state_ != DOWN_STATE) {
-          tracker_state_ = BTN_DEBOUNCE_UP;
-        }
         break;
-      }
-      case BTN_DOWN: {
+
+      // button is held down
+      case BTN_HELD:
         if (button_state_ != DOWN_STATE) {
-          tracker_state_ = BTN_DEBOUNCE_UP;
           event_time_ = HAL_GetTick() + DEBOUNCE_DELAY;
+          tracker_state_ = RELEASE_DETECTED_HELD;
         }
         return btn_event_t::HELD;
-        break;
-      }
-      case BTN_DEBOUNCE_UP: {
+
+      // button was released
+      case RELEASE_DETECTED_NO_HELD:
+      case RELEASE_DETECTED_HELD:
+        if (button_state_ == DOWN_STATE) {
+          // false positive
+          tracker_state_ = tracker_state_ == RELEASE_DETECTED_HELD ? BTN_HELD : PRESS_WAIT_HELD;
+        }
         if (utils::elapsed(HAL_GetTick(), event_time_)) {
-          if (button_state_ != DOWN_STATE) {
-            tracker_state_ = BTN_UP;  // actual button press
-            return btn_event_t::RELEASED;
-          } else {
-            tracker_state_ = BTN_DOWN;  // false signal / noise
-          }
+          // debounced and still released
+          tracker_state_ = BTN_UP;
+          return btn_event_t::RELEASED;
         }
-        return btn_event_t::HELD;
+        return tracker_state_ == RELEASE_DETECTED_HELD ? btn_event_t::HELD : btn_event_t::NONE;
+
+
+      default:
         break;
-      }
     }
     return btn_event_t::NONE;
   };
@@ -110,7 +116,7 @@ public:
 
 private:
   static constexpr uint32_t HELD_DELAY = 300;
-  static constexpr uint32_t DEBOUNCE_DELAY = 5;
+  static constexpr uint32_t DEBOUNCE_DELAY = 10;
   static constexpr bool DOWN_STATE = PRESSED_STATE;
 
   uint32_t event_time_{};
@@ -119,9 +125,10 @@ private:
 
   enum btn_state : uint8_t {
     BTN_UP,
-    BTN_DEBOUNCE_DOWN,
-    BTN_WAIT_DOWN,
-    BTN_DOWN,
-    BTN_DEBOUNCE_UP,
+    PRESS_DETECTED,
+    PRESS_WAIT_HELD,
+    BTN_HELD,
+    RELEASE_DETECTED_NO_HELD,
+    RELEASE_DETECTED_HELD,
   } tracker_state_ = BTN_UP;
 };
