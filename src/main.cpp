@@ -53,7 +53,40 @@ static void led_task(void*) {
   }
 }
 
+static void monitor_task(void*) {
+  vTaskDelay(pdMS_TO_TICKS(10000));  // wait for all tasks to start
+  const auto num_of_tasks = uxTaskGetNumberOfTasks();
+
+  auto statuses = static_cast<TaskStatus_t*>(pvPortMalloc(num_of_tasks * sizeof(TaskStatus_t)));
+
+  constexpr size_t memory_low_th{ 20 };
+  while (1) {
+    if (auto n = uxTaskGetSystemState(statuses, num_of_tasks, NULL)) {
+      for (unsigned int i = 0; i < n; ++i) {
+        if (statuses[i].usStackHighWaterMark < memory_low_th) {
+          uart2.printf("\tMEM_WARN: %s : %d\n", statuses[i].pcTaskName, statuses[i].usStackHighWaterMark);
+        }
+      }
+    } else {
+      uart2.printf("Couldn't get system state\n");
+    }
+
+    if (xPortGetFreeHeapSize() < memory_low_th) {
+      uart2.printf("\tMEM_WARN: HEAP : %d\n", static_cast<int>(xPortGetFreeHeapSize()));
+    }
+
+    vTaskDelay(pdMS_TO_TICKS(10000));
+  }
+}
+
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char* pcTaskName) {
+  static std::array<char, 50> buff;
+  snprintf(buff.data(), buff.size() - 1, "OVERFLOW: %s", pcTaskName);
+  while (1) {
+    uart2.transmit(buff.data());
+    HAL_Delay(2000);
+  }
+
   assert_param(0);
 }
 
@@ -70,10 +103,11 @@ int main(void) {
   TaskHandle_t led_handle, uart2_handle, display_handle;
   xTaskCreate(led_task, "blink task", 128, nullptr, 20, &led_handle);
   xTaskCreate(uart_task, "uart2 RX task", 128, nullptr, 20, &uart2_handle);
-  xTaskCreate(display_task, "display task", 128, nullptr, 20, &display_handle);
+  xTaskCreate(display_task, "display task", 150, nullptr, 20, &display_handle);
 
-  // uart2.register_task_to_notify_on_rx(uart2_handle);
+  uart2.register_task_to_notify_on_rx(uart2_handle);
 
+  xTaskCreate(monitor_task, "monitor task", 110, nullptr, 20, &led_handle);
   vTaskStartScheduler();
   while (1) {
   }

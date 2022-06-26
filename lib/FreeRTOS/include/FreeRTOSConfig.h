@@ -13,7 +13,7 @@ extern uint32_t SystemCoreClock;
 #define configCPU_CLOCK_HZ                      (SystemCoreClock)
 #define configTICK_RATE_HZ                      ((TickType_t)1000)
 #define configMAX_PRIORITIES                    50
-#define configMINIMAL_STACK_SIZE                128
+#define configMINIMAL_STACK_SIZE                40
 #define configMAX_TASK_NAME_LEN                 16
 #define configUSE_16_BIT_TICKS                  0
 #define configIDLE_SHOULD_YIELD                 1
@@ -35,7 +35,7 @@ extern uint32_t SystemCoreClock;
 /* Memory allocation related definitions. */
 #define configSUPPORT_STATIC_ALLOCATION           0
 #define configSUPPORT_DYNAMIC_ALLOCATION          1
-#define configTOTAL_HEAP_SIZE                     ((size_t)3572)
+#define configTOTAL_HEAP_SIZE                     ((size_t)4092)
 #define configAPPLICATION_ALLOCATED_HEAP          0
 #define configSTACK_ALLOCATION_FROM_SEPARATE_HEAP 0
 
