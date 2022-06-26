@@ -31,10 +31,6 @@ void pre_test() {
   uart1.register_task_to_notify_on_rx(uart_handle);
 }
 
-void setUp() {
-}
-void tearDown() {
-}
 
 
 void test_command_called() {

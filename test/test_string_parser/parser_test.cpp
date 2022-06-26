@@ -6,8 +6,6 @@ StringParser parser;
 void setUp() {
   parser = StringParser();
 }
-void tearDown() {
-}
 
 
 template <size_t N>

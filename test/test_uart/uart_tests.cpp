@@ -2,8 +2,6 @@
 #include "nanoprintf.h"
 #include <unity.h>
 
-void setUp() {
-}
 void tearDown() {
   uart1.flush();
   vTaskDelay(pdMS_TO_TICKS(500));

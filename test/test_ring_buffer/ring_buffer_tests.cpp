@@ -8,10 +8,6 @@
 #include "ring_buffer.h"
 #include <unity.h>
 
-void setUp() {
-}
-void tearDown() {
-}
 
 void test_buffer_create() {
   RingBuffer<uint8_t, 10> buffer;

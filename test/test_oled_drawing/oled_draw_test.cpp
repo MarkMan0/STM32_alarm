@@ -13,8 +13,6 @@ void setUp() {
   gfx.draw();
   gfx.move_cursor({ 0, 0 });
 }
-void tearDown() {
-}
 
 void test_set_pixel() {
   gfx.set_pixel({ 10, 10 });

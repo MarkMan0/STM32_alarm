@@ -29,6 +29,12 @@ int main() {
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char* pcTaskName) {
   assert_param(0);
 }
+
+__weak void setUp() {
+}
+__weak void tearDown() {
+}
+
 __attribute__((weak)) void pre_test() {
 }
 
