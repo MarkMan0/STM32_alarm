@@ -4,8 +4,8 @@
  */
 #include "unity_config.h"
 #include "../src/main.h"
-#include <cstdio>
 #include <unity.h>
+#include "nanoprintf.h"
 
 static UART_HandleTypeDef UartHandle;
 
@@ -79,7 +79,7 @@ void Error_Handler() {
 
 void assert_failed(uint8_t* file, uint32_t line) {
   char buff[40];
-  snprintf(buff, 40, "ASSERT: %s  :: %d", file, static_cast<int>(line));
+  npf_snprintf(buff, 40, "ASSERT: %s  :: %d", file, static_cast<int>(line));
   TEST_MESSAGE(buff);
   return;
 }

@@ -19,6 +19,7 @@
 #include "globals.h"
 #include "encoder.h"
 #include "queue.h"
+#include "nanoprintf.h"
 
 void SystemClock_Config(void);
 
@@ -100,7 +101,7 @@ static void monitor_task(void*) {
 
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char* pcTaskName) {
   static std::array<char, 50> buff;
-  snprintf(buff.data(), buff.size() - 1, "OVERFLOW: %s", pcTaskName);
+  npf_snprintf(buff.data(), buff.size() - 1, "OVERFLOW: %s", pcTaskName);
   while (1) {
     uart2.transmit(buff.data());
     HAL_Delay(2000);

@@ -1,6 +1,7 @@
 #include "screens.h"
 #include "display_task.h"
 #include "globals.h"
+#include "nanoprintf.h"
 
 static std::array<char, 15> time_str;
 void MainScreen::draw() {
@@ -9,7 +10,7 @@ void MainScreen::draw() {
   DS3231::time t;
   if (0 == rtc.get_time(t)) {
     constexpr char fmt[] = "%02d:%02d:%02d";
-    int len = snprintf(time_str.data(), time_str.size(), fmt, t.hour, t.min, t.sec);
+    int len = npf_snprintf(time_str.data(), time_str.size(), fmt, t.hour, t.min, t.sec);
     ++len;
     len *= 8;  // width of font
     gfx.move_cursor({ 128 - len, 0 });

@@ -2,7 +2,7 @@
 #include "DS3231.h"
 #include "unity.h"
 #include <optional>
-
+#include "nanoprintf.h"
 
 RTOS_I2C i2c1;
 DS3231 rtc(i2c1);
@@ -116,7 +116,7 @@ void test_alarm() {
   char buff[30];
   while (t.min < alarm.min) {
     HAL_Delay(1000);
-    snprintf(buff, 29, "Wait: %ds", 60 - t.sec);
+    npf_snprintf(buff, 29, "Wait: %ds", 60 - t.sec);
     TEST_MESSAGE(buff);
     res = rtc.get_time(t);
     TEST_ASSERT_EQUAL_MESSAGE(0, res, "Get Time failed");
