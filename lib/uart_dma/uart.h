@@ -114,7 +114,7 @@ public:
   void flush();
   ///@}
 
-  void tick();  ///< Called peridically to empty the transmit buffer
+  void tick();  ///< Called periodically to empty the transmit buffer
 
   void reset_buffers();  ///< Resets both buffers so head=tail=0
 
@@ -166,7 +166,7 @@ public:
   /** @name UART2 init and callback functions */
   ///@{
 
-  /** @brief Initialization of the UART peripherial and handle */
+  /** @brief Initialization of the UART peripheral and handle */
   static void uart2_hw_init(UART_DMA&);
   /** @brief Enables interrupts for UART and DMAs */
   static void uart2_enable_isrs(UART_DMA&);
@@ -180,7 +180,7 @@ public:
   /** @name UART1 init and callback functions */
   ///@{
 
-  /** @brief Initialization of the UART peripherial and handle */
+  /** @brief Initialization of the UART peripheral and handle */
   static void uart1_hw_init(UART_DMA&);
   /** @brief Enables interrupts for UART and DMAs */
   static void uart1_enable_isrs(UART_DMA&);
