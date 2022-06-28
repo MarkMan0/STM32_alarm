@@ -23,21 +23,28 @@ void Menu::tick() {
   }
 
   using e = btn_event_t;
-  switch (encoder.btn.get_state()) {
-    case e::NONE:
-      break;
-    case e::PRESSED:
-      curr_screen_->onClickDown();
-      break;
-    case e::RELEASED:
-      if (not held_handled_) {
-        curr_screen_->onClickUp();
-      }
-      held_handled_ = false;
-      break;
-    case e::HELD:
-      held_handled_ = curr_screen_->onClickHeld();
-      break;
+  const auto state = encoder.btn.get_state();
+  if (not was_sleeping_) {
+    // ignore button after sleep
+    switch (state) {
+      case e::NONE:
+        break;
+      case e::PRESSED:
+        curr_screen_->onClickDown();
+        break;
+      case e::RELEASED:
+        if (not held_handled_) {
+          curr_screen_->onClickUp();
+        }
+        held_handled_ = false;
+        break;
+      case e::HELD:
+        held_handled_ = curr_screen_->onClickHeld();
+        break;
+    }
+  } else if (state == e::RELEASED) {
+    // wakeup press released, continue as normal
+    was_sleeping_ = false;
   }
 
 

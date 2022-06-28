@@ -46,9 +46,6 @@ void rtos_tasks::gpio_task(void*) {
       }
       if (cont.pin_SW & 2) {
         ms = encoder.btn.update_btn(cont.pin_SW & 1);
-        if (ms) {
-          next_timeout = pdMS_TO_TICKS(ms);
-        }
       }
     } else {
       ms = encoder.btn.update_btn(cont.pin_SW & 1);
