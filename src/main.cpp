@@ -53,6 +53,7 @@ int main(void) {
   /// Initialize RTOS objects and tasks
 
   rtos_obj::gpio_queue = xQueueCreate(10, sizeof(GPIOStateContainer));
+  rtos_obj::btn_event_queue = xQueueCreate(3, sizeof(btn_event_t));
 
   uart2.begin(&rtos_obj::uart2_tx_handle);
   xTaskCreate(rtos_tasks::gpio_task, "GPIO task", 128, nullptr, 20, &rtos_obj::gpio_handle);

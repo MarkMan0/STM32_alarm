@@ -18,6 +18,7 @@ namespace rtos_tasks {
 
 namespace rtos_obj {
   extern QueueHandle_t gpio_queue;
+  extern QueueHandle_t btn_event_queue;
   extern TaskHandle_t display_handle;
   extern TaskHandle_t led_handle;
   extern TaskHandle_t command_handle;

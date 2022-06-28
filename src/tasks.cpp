@@ -8,6 +8,7 @@
 
 namespace rtos_obj {
   QueueHandle_t gpio_queue;
+  QueueHandle_t btn_event_queue;
   TaskHandle_t display_handle;
   TaskHandle_t led_handle;
   TaskHandle_t command_handle;
@@ -33,27 +34,33 @@ void rtos_tasks::command_task(void*) {
 void rtos_tasks::gpio_task(void*) {
   GPIOStateContainer cont{ 0 };
 
+  TickType_t next_timeout = portMAX_DELAY;
 
   while (1) {
-    if (pdPASS != xQueueReceive(rtos_obj::gpio_queue, &cont, portMAX_DELAY)) {
-      continue;
+    uint32_t ms{ 0 };
+    uart2.printf("GPIO_TASK\n");
+    if (pdPASS == xQueueReceive(rtos_obj::gpio_queue, &cont, next_timeout)) {
+      // new data
+      if (cont.pin_A & 2 && cont.pin_B & 2) {
+        encoder.enc.update(cont.pin_A & 1, cont.pin_B & 1);
+      }
+      if (cont.pin_SW & 2) {
+        ms = encoder.btn.update_btn(cont.pin_SW & 1);
+        if (ms) {
+          next_timeout = pdMS_TO_TICKS(ms);
+        }
+      }
+    } else {
+      ms = encoder.btn.update_btn(cont.pin_SW & 1);
     }
-    bool was_event = false;
 
-    if (cont.pin_A & 2 && cont.pin_B & 2) {
-      // uart2.printf("%d\t%d\n", cont.pin_A & 1, cont.pin_B & 1);
-      bool b = encoder.enc.update(cont.pin_A & 1, cont.pin_B & 1);
-      was_event = was_event | b;
+    if (ms) {
+      next_timeout = pdMS_TO_TICKS(ms);
+    } else {
+      next_timeout = portMAX_DELAY;
     }
 
-    if (cont.pin_SW & 2) {
-      encoder.btn.update_btn(cont.pin_SW & 1);
-      was_event = true;
-    }
-
-    if (was_event) {
-      xTaskNotify(rtos_obj::display_handle, 0, eNoAction);
-    }
+    xTaskNotify(rtos_obj::display_handle, 0, eNoAction);
   }
 }
 

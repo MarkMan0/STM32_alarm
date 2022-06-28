@@ -47,17 +47,19 @@ enum class btn_event_t {
 template <bool PRESSED_STATE = false>
 class BtnTracker {
 public:
-  void update_btn(bool btn) {
+  uint32_t update_btn(bool btn) {
     button_state_ = btn;
+    return update_btn();
   }
 
-  btn_event_t get_state() {
+  uint32_t update_btn() {
     switch (tracker_state_) {
       // Just pressed
       case BTN_UP:
         if (button_state_ == DOWN_STATE) {
           event_time_ = HAL_GetTick() + DEBOUNCE_DELAY;
           tracker_state_ = PRESS_DETECTED;
+          return DEBOUNCE_DELAY;  // should be called again after debounce_delay
         }
         break;
 
@@ -68,7 +70,8 @@ public:
         } else if (utils::elapsed(HAL_GetTick(), event_time_)) {
           tracker_state_ = PRESS_WAIT_HELD;
           event_time_ += HELD_DELAY - DEBOUNCE_DELAY;
-          return btn_event_t::PRESSED;  // debounce success
+          register_press();                    // register the button press
+          return HELD_DELAY - DEBOUNCE_DELAY;  // call again after held delay elapsed
         }
         break;
 
@@ -76,10 +79,11 @@ public:
       case PRESS_WAIT_HELD:
         if (button_state_ != DOWN_STATE) {
           event_time_ = HAL_GetTick() + DEBOUNCE_DELAY;
-          tracker_state_ = RELEASE_DETECTED_NO_HELD;
+          tracker_state_ = RELEASE_DETECTED;
+          return DEBOUNCE_DELAY;  // debounce release, call after delay
         } else if (utils::elapsed(HAL_GetTick(), event_time_)) {
           tracker_state_ = BTN_HELD;
-          return btn_event_t::HELD;
+          register_held();
         }
         break;
 
@@ -87,28 +91,42 @@ public:
       case BTN_HELD:
         if (button_state_ != DOWN_STATE) {
           event_time_ = HAL_GetTick() + DEBOUNCE_DELAY;
-          tracker_state_ = RELEASE_DETECTED_HELD;
+          tracker_state_ = RELEASE_DETECTED;
+          return DEBOUNCE_DELAY;  // debounce release, call after delay
         }
-        return btn_event_t::HELD;
 
       // button was released
-      case RELEASE_DETECTED_NO_HELD:
-      case RELEASE_DETECTED_HELD:
+      case RELEASE_DETECTED:
         if (button_state_ == DOWN_STATE) {
           // false positive
-          tracker_state_ = tracker_state_ == RELEASE_DETECTED_HELD ? BTN_HELD : PRESS_WAIT_HELD;
+          tracker_state_ = BTN_HELD;
         }
         if (utils::elapsed(HAL_GetTick(), event_time_)) {
           // debounced and still released
           tracker_state_ = BTN_UP;
-          return btn_event_t::RELEASED;
+          register_release();
         }
-        return tracker_state_ == RELEASE_DETECTED_HELD ? btn_event_t::HELD : btn_event_t::NONE;
 
 
       default:
         break;
     }
+    return 0;
+  }
+
+  btn_event_t get_state() {
+    if (press_event_) {
+      press_event_ = false;
+      return btn_event_t::PRESSED;
+    }
+    if (release_event_) {
+      release_event_ = false;
+      return btn_event_t::RELEASED;
+    }
+    if (held_event_) {
+      return btn_event_t::HELD;
+    }
+
     return btn_event_t::NONE;
   };
 
@@ -121,14 +139,37 @@ private:
 
   uint32_t event_time_{};
 
+  bool press_event_{ false }, held_event_{ false }, release_event_{ false };
+
+  void register_press() {
+    release_event_ = false;
+    held_event_ = false;
+    press_event_ = true;
+  }
+  void register_held() {
+    held_event_ = true;
+  }
+  void register_release() {
+    held_event_ = false;
+    release_event_ = true;
+  }
+
   bool button_state_ = !DOWN_STATE;
 
-  enum btn_state : uint8_t {
+  enum report_state_t : uint8_t {
+    REPORT_NONE,
+    REPORT_PRESSED,
+    REPORT_HELD,
+    REPORT_RELEASED,
+  };
+  report_state_t report_state{ REPORT_NONE };
+
+  enum tracker_state_t : uint8_t {
     BTN_UP,
     PRESS_DETECTED,
     PRESS_WAIT_HELD,
     BTN_HELD,
-    RELEASE_DETECTED_NO_HELD,
-    RELEASE_DETECTED_HELD,
-  } tracker_state_ = BTN_UP;
+    RELEASE_DETECTED,
+  };
+  tracker_state_t tracker_state_ = BTN_UP;
 };
