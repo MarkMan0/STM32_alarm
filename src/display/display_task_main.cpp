@@ -16,18 +16,23 @@ void rtos_tasks::display_task(void* ptr_in) {
   uint32_t next_sleep = HAL_GetTick() + 10000;
 
   TickType_t timeout = pdMS_TO_TICKS(100);
+  bool was_sleeping = false;
   while (1) {
     if (pdPASS == xTaskNotifyWait(0, UINT32_MAX, nullptr, timeout)) {
       next_sleep = HAL_GetTick() + 10000;
       timeout = pdMS_TO_TICKS(100);
+      if (was_sleeping) {
+        display.begin();
+        was_sleeping = false;
+      }
     }
     if (utils::elapsed(HAL_GetTick(), next_sleep)) {
       timeout = portMAX_DELAY;
       menu.sleep();
       gfx.clear_canvas();
-      gfx.move_cursor({ 0, 0 });
-      gfx.printf("Sleeping...");
       gfx.draw();
+      display.sleep();
+      was_sleeping = true;
     } else {
       menu.tick();
     }

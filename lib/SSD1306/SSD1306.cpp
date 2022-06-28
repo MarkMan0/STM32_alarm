@@ -68,3 +68,9 @@ bool SSD1306::reset_ram_address() {
   static constexpr uint8_t buff[]{ SSD_1306_reg::SET_PAGE_ADDRESS, 0, 0x7, SSD_1306_reg::SET_COLUMN_ADDRESS, 0, 127 };
   return i2c_.write_register(addr_, 0x00, const_cast<uint8_t*>(buff), sizeof(buff));
 }
+
+
+bool SSD1306::sleep() {
+  uint8_t conf = SSD_1306_reg::SET_DISPLAY_OFF;
+  return i2c_.write_register(addr_, 0, &conf, sizeof(1));
+}

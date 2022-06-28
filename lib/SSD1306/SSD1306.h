@@ -15,6 +15,8 @@ public:
 
   void set_ram_val(uint8_t val);
 
+  bool sleep();
+
 private:
   bool reset_ram_address();
   RTOS_I2C& i2c_;
