@@ -114,7 +114,7 @@ static HAL_StatusTypeDef init_TIM7(uint32_t TickPriority) {
 
   HAL_RCC_GetClockConfig(&clkconfig, &pFLatency);
 
-  uwTimclock = HAL_RCC_GetPCLK1Freq();
+  uwTimclock = 2 * HAL_RCC_GetPCLK1Freq();
 
   uwPrescalerValue = (uint32_t)((uwTimclock / 1000000) - 1);
 
