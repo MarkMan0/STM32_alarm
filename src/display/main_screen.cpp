@@ -65,7 +65,7 @@ void MainMenuScreen::draw() {
 void MainMenuScreen::onEncoder(int32_t increment) {
   if (increment > 0) {
     ++current_item_;
-  } else if (increment < 0) {
+  } else if (increment < 0 && current_item_) {  // do not decrement below zero
     --current_item_;
   }
   current_item_ = utils::constrain(current_item_, 0, num_items - 1);
