@@ -31,7 +31,7 @@ void MainScreen::draw() {
         } else {
           gfx.printf("%d: ", alarm.dow);
         }
-        gfx.printf("%d:%d\n", alarm.hour, alarm.min);
+        gfx.printf("%02d:%02d\n", alarm.hour, alarm.min);
       } else {
         gfx.printf("OFF\n");
       }

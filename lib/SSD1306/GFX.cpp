@@ -11,6 +11,7 @@
 #include "utils.h"
 #include "main.h"
 #include "SSD1306.h"
+#include "nanoprintf.h"
 
 
 std::pair<uint8_t, uint8_t> GFX::get_page_and_mask(uint8_t row) const {
@@ -192,9 +193,9 @@ void GFX::move_cursor(const Pixel& to) {
 }
 
 void GFX::printf(const char* fmt, ...) {
-  va_list args;
+  std::va_list args;
   va_start(args, fmt);
-  vprintf(fmt, args);
+  npf_vpprintf(putc, this, fmt, args);
   va_end(args);
 }
 
@@ -277,4 +278,10 @@ void GFX::vprintf(const char* fmt, va_list args) {
       }
     }
   }
+}
+
+void GFX::putc(int c, void* ptr) {
+  GFX& gfx = *reinterpret_cast<GFX*>(ptr);
+  bool b = true;
+  gfx.render_one(c, 8, b);
 }

@@ -77,6 +77,8 @@ public:
     ssd_1306_ = ssd;
   }
 
+  static void putc(int c, void*);
+
 private:
   canvas_t canvas_{ 0 }; /*!< drawing canvas */
   Pixel cursor_;         /*!< cursor for text drawing*/
