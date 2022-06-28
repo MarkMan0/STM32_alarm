@@ -22,7 +22,9 @@ void test_task(void*) {
 
 
 void pre_test() {
-  uart1.begin(115200);
+  uart1.hw_init(115200);
+  TaskHandle_t handle;
+  uart1.begin(&handle);
 }
 
 

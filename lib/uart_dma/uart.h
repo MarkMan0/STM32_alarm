@@ -27,7 +27,8 @@ public:
 
   UART_DMA(hw_init_fcn_t*, isr_enable_fcn_t*);  ///< Provide the necessary callbacks
 
-  void begin(uint32_t baud);  ///< Call once only, to init the hardware and start tasks
+  void hw_init(uint32_t baud);  ///< Call once only, to init the hardware and start tasks
+  void begin(TaskHandle_t* tx_task);
 
   /// @brief Return the number of bytes available for reading
   [[nodiscard]] uint16_t available() const {

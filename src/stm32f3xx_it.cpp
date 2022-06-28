@@ -6,6 +6,7 @@
 #include "main.h"
 #include "stm32f3xx_it.h"
 #include "globals.h"
+#include "tasks.h"
 
 /******************************************************************************/
 /*           Cortex-M4 Processor Interruption and Exception Handlers          */
@@ -77,7 +78,7 @@ void EXTI4_IRQHandler(void) {
   GPIOStateContainer gpio{ 0 };
   gpio.pin_A = 2 | read_pin(pins::enc_A);
   gpio.pin_B = 2 | read_pin(pins::enc_B);
-  xQueueSendFromISR(gpio_queue, &gpio, NULL);
+  xQueueSendFromISR(rtos_obj::gpio_queue, &gpio, NULL);
 }
 
 
@@ -85,5 +86,5 @@ void EXTI1_IRQHandler(void) {
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_1);
   GPIOStateContainer gpio{ 0 };
   gpio.pin_SW = 2 | read_pin(pins::enc_SW);
-  xQueueSendFromISR(gpio_queue, &gpio, NULL);
+  xQueueSendFromISR(rtos_obj::gpio_queue, &gpio, NULL);
 }

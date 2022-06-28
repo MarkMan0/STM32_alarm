@@ -20,14 +20,18 @@ void UART_DMA::generic_tx_task(void* ptr) {
 UART_DMA::UART_DMA(hw_init_fcn_t* a, isr_enable_fcn_t* b) : hw_init_cb(a), isr_enable_cb(b) {
 }
 
-void UART_DMA::begin(uint32_t baud) {
+void UART_DMA::hw_init(uint32_t baud) {
   baudrate_ = baud;
   hw_init_cb(*this);
   isr_enable_cb(*this);
+}
 
+void UART_DMA::begin(TaskHandle_t* tx_task) {
   tx_buff_mtx_ = xSemaphoreCreateBinary();
   xSemaphoreGive(tx_buff_mtx_);
   xTaskCreate(generic_tx_task, "tx task", 60, this, 20, &tx_task_);
+
+  *tx_task = tx_task_;  // export task handle
 
 
   HAL_UART_Receive_DMA(&huart_, dma_buff_.buff_.data(), dma_buff_.buff_.size());

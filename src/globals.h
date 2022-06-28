@@ -12,10 +12,8 @@
 extern UART_DMA uart2;
 extern RTOS_I2C i2c;
 extern DS3231 rtc;
-extern SSD1306 display;
-extern GFX gfx;
 extern CommandDispatcher cmd;
-extern QueueHandle_t gpio_queue;
+extern TIM_HandleTypeDef htim7;
 
 struct RotaryEncoder {
   Encoder enc;

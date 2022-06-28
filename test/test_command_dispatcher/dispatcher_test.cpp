@@ -26,7 +26,9 @@ static void uart_task(void*) {
 
 
 void pre_test() {
-  uart1.begin(115200);
+  uart1.hw_init(115200);
+  TaskHandle_t handle;
+  uart1.begin(&handle);
   xTaskCreate(uart_task, "uart1 task", 128, nullptr, 10, &uart_handle);
   uart1.register_task_to_notify_on_rx(uart_handle);
 }
