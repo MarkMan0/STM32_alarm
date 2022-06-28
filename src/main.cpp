@@ -58,7 +58,7 @@ int main(void) {
   uart2.begin(&rtos_obj::uart2_tx_handle);
   xTaskCreate(rtos_tasks::gpio_task, "GPIO task", 128, nullptr, 20, &rtos_obj::gpio_handle);
   xTaskCreate(rtos_tasks::command_task, "Command task", 128, nullptr, 20, &rtos_obj::command_handle);
-  xTaskCreate(rtos_tasks::display_task, "display task", 150, nullptr, 20, &rtos_obj::display_handle);
+  xTaskCreate(rtos_tasks::ui_task, "UI task", 150, nullptr, 20, &rtos_obj::display_handle);
   xTaskCreate(rtos_tasks::monitor_task, "monitor task", 110, nullptr, 20, &rtos_obj::monitor_handle);
 
   uart2.register_task_to_notify_on_rx(rtos_obj::command_handle);

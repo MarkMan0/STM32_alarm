@@ -10,7 +10,7 @@ namespace rtos_tasks {
 
   void gpio_task(void*);
   void command_task(void*);
-  void display_task(void*);
+  void ui_task(void*);
   void monitor_task(void*);
 
 };  // namespace rtos_tasks

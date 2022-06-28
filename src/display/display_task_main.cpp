@@ -8,7 +8,7 @@ Menu menu;
 SSD1306 display(i2c);
 GFX gfx;
 
-void rtos_tasks::display_task(void* ptr_in) {
+void rtos_tasks::ui_task(void* ptr_in) {
   display.begin();
   gfx.insert_ssd1306_dependency(&display);
   menu.init();
