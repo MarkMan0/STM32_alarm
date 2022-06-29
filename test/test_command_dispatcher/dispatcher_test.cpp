@@ -1,3 +1,6 @@
+/**
+ * @file dispatcher_test.cpp
+ */
 #include "uart.h"
 #include "task.h"
 #include "command_parser.h"
@@ -8,6 +11,7 @@ static CommandDispatcher cmd(&uart1);
 
 static int glob_val = 0;
 
+/// test task
 void CommandDispatcher::T100() {
   ++glob_val;
 }
@@ -24,7 +28,7 @@ static void uart_task(void*) {
   }
 }
 
-
+// start the uart task
 void pre_test() {
   uart1.hw_init(115200);
   TaskHandle_t handle;
@@ -34,7 +38,7 @@ void pre_test() {
 }
 
 
-
+/// Test if Dispatcher calls command
 void test_command_called() {
   glob_val = 0;
   uart1.printf("T100\n");

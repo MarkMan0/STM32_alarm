@@ -60,10 +60,10 @@ namespace fonts {
    *
    */
   struct Font_t {
-    const uint8_t* const font_;
-    const uint8_t width;
-    const uint16_t num_glyphs_;
-    const uint8_t offset_;
+    const uint8_t* const font_;  ///< Pointer to the font
+    const uint8_t width;         ///< Width of characters
+    const uint16_t num_glyphs_;  ///< Number of characters in font
+    const uint8_t offset_;       ///< The ascii code of the first character in the font
   };
 
   /**

@@ -1,17 +1,23 @@
+/**
+ * @file screens.h
+ * @brief Declaration of Screens
+ *
+ */
+
 #pragma once
 
 #include "abstract_screen.h"
 #include <variant>
 
 
+/// The default screen
 class MainScreen : public AbstractScreen {
 public:
-  // void onEntry() override;
   void draw() override;
   bool onClickUp() override;
-  // void onEncoder(int32_t) override;
 };
 
+/// Main menu
 class MainMenuScreen : public AbstractScreen {
 public:
   void draw() override;
@@ -25,6 +31,7 @@ private:
   unsigned current_item_ = 0;
 };
 
+/// Example screen
 class Screen2 : public AbstractScreen {
 public:
   void draw() override;
@@ -34,11 +41,15 @@ public:
 private:
   unsigned counter_ = 0;
 };
+
+/// Example screen
 class Screen3 : public AbstractScreen {
 public:
   void draw() override;
   bool onClickUp() override;
 };
+
+/// Example screen
 class Screen4 : public AbstractScreen {
 public:
   void draw() override;

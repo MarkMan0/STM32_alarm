@@ -1,3 +1,6 @@
+/**
+ * @file oled_draw_test.cpp
+ */
 #include "FreeRTOS.h"
 #include "GFX.h"
 #include <unity.h>
@@ -6,7 +9,7 @@
 
 static RTOS_I2C i2c;
 static SSD1306 display(i2c);
-static GFX gfx;
+static GFX gfx(&display);
 
 void setUp() {
   gfx.clear_canvas();
@@ -14,6 +17,7 @@ void setUp() {
   gfx.move_cursor({ 0, 0 });
 }
 
+/// test manipulation of individual pixels
 void test_set_pixel() {
   gfx.set_pixel({ 10, 10 });
   gfx.draw();
@@ -22,6 +26,7 @@ void test_set_pixel() {
   gfx.draw();
 }
 
+/// Test draw_rectangle function
 void test_draw_rectangle() {
   Pixel start{ 40, 13 };
   Pixel size{ 20, 5 };
@@ -37,6 +42,7 @@ void test_draw_rectangle() {
   }
 }
 
+/// Test simple text rendering
 void test_draw_text() {
   const char* txt = "Hello world!";
 
@@ -45,6 +51,7 @@ void test_draw_text() {
   gfx.draw();
 }
 
+/// Test printf method
 void test_printf() {
   char fmt[] = "%s %d%c";
   gfx.printf(fmt, "Five: ", 5, '?');
@@ -67,8 +74,7 @@ void test_task(void*) {
 
 
 void pre_test() {
-  i2c.init_i2c1();
+  RTOS_I2C::init_i2c1(&i2c);
   display.begin();
   gfx.clear_canvas();
-  gfx.insert_ssd1306_dependency(&display);
 }

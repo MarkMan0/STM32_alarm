@@ -15,6 +15,7 @@
 
 class SSD1306;
 
+/// Represents a pixel on the display
 struct Pixel {
   using data_t = int;
   data_t x_{ 0 };
@@ -31,9 +32,13 @@ struct Pixel {
   }
 };
 
+/// Graphics driver for the SSD1306
 class GFX {
 public:
-  using canvas_t = std::array<std::array<uint8_t, 8>, 128>; /*!< canvas, where each bit is one pixel */
+  using canvas_t = std::array<std::array<uint8_t, 8>, 128>;  ///< canvas, where each bit is one pixel
+
+  GFX(SSD1306* ssd) : ssd_1306_(ssd) {
+  }
 
   void set_pixel(const Pixel& pix, bool val = true);
   void reset_pixel(const Pixel& pix);
@@ -63,27 +68,20 @@ public:
 
   void move_cursor(const Pixel& to);
 
-  /**
-   * @brief Draws printf-style format text, very limited capabilities
-   * @see vprintf
-   * @param fmt Only use %d and %s
-   * @param ...
-   */
+  /// Draw printf-style text to display
   void printf(const char* fmt, ...);
 
+  /// Transfer the buffer onto the display
   void draw();
 
-  void insert_ssd1306_dependency(SSD1306* ssd) {
-    ssd_1306_ = ssd;
-  }
-
-  static void putc(int c, void*);
+  /// Used by nanoprintf to render characters. @p p must point to and instance of GFX / this
+  static void putc(int c, void* p);
 
 private:
-  canvas_t canvas_{ 0 }; /*!< drawing canvas */
-  Pixel cursor_;         /*!< cursor for text drawing*/
+  canvas_t canvas_{ 0 };  ///< drawing canvas
+  Pixel cursor_;          ///< cursor for text drawing
 
-  SSD1306* ssd_1306_{ nullptr };
+  SSD1306* const ssd_1306_{ nullptr };
 
   /**
    * @brief For a given row, returns the page number and bit mask
@@ -120,14 +118,6 @@ private:
       }
     }
   }
-
-  /**
-   * @brief draw the formatted string to the canvas, limited capabilities
-   * @details Currently only supports %d and %s, without width specifiers
-   * @param fmt
-   * @param args
-   */
-  void vprintf(const char* fmt, va_list args);
 
   /**
    * @brief Render one character and advances the cursor

@@ -1,9 +1,13 @@
+/**
+ * @file btn_tracker_test.cpp
+ */
+
 #include "unity.h"
 #include "../main.h"
 #include "encoder.h"
 
 
-
+/// Test all of the button events and debounce
 void test_button_tracker() {
   using e = btn_event_t;
   BtnTracker<true> tracker;
@@ -13,6 +17,7 @@ void test_button_tracker() {
   TEST_ASSERT_EQUAL_MESSAGE(e::NONE, tracker.get_state(), "first update wrong");
   tracker.update_btn(0);
   HAL_Delay(200);
+  tracker.update_btn(0);
   TEST_ASSERT_EQUAL_MESSAGE(e::NONE, tracker.get_state(), "did not ignore noise");
   // correct debounce, ignored noise
 

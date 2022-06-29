@@ -370,6 +370,7 @@ namespace pins {
                         enc_B = PA5, enc_SW = PA1, alarm_it = PA6;
 }  // namespace pins
 
+/// @brief pin labels on the board
 namespace pin_labels {
   inline constexpr auto A0 = PA0, A1 = PA1, A2 = PA3, A3 = PA4, A4 = PA5, A5 = PA6, A6 = PA7, A7 = PA2, D0 = PA10,
                         D1 = PA9, D2 = PA12, D3 = PB0, D4 = PB7, D5 = PB6, D6 = PB1, D7 = PF0, D8 = PF1, D9 = PA8,

@@ -1,7 +1,11 @@
+/**
+ * @file uart_tests.cpp
+ */
 #include "uart_tests.h"
 #include "nanoprintf.h"
 #include <unity.h>
 
+/// Empty and reset buffers
 void tearDown() {
   uart1.flush();
   vTaskDelay(pdMS_TO_TICKS(500));

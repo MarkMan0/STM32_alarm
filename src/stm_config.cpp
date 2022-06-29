@@ -1,8 +1,13 @@
+/**
+ * @file stm_config.cpp
+ * @brief Board and MCU configuration
+ */
+
 #include "main.h"
 #include "stm_config.h"
 #include "FreeRTOS.h"
 
-TIM_HandleTypeDef htim7;
+TIM_HandleTypeDef htim7;  ///< Timer used for HAL tick
 
 
 void SystemClock_Config(void) {
@@ -47,10 +52,6 @@ void SystemClock_Config(void) {
  * @retval None
  */
 void Error_Handler(void) {
-  /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-
-  /* USER CODE END Error_Handler_Debug */
 }
 
 #ifdef USE_FULL_ASSERT
@@ -77,9 +78,8 @@ void HAL_MspInit(void) {
   __HAL_RCC_PWR_CLK_ENABLE();
 }
 
-// Config TIM7 as HAL clock
 
-
+/// Called by HAL when timer period elapses
 static void TIM7_period_elapsed_cb(TIM_HandleTypeDef* htim) {
   assert_param(&htim7 == htim);
 
@@ -88,6 +88,7 @@ static void TIM7_period_elapsed_cb(TIM_HandleTypeDef* htim) {
   }
 }
 
+/// TIM init for 1kHz / 1ms period
 static HAL_StatusTypeDef init_TIM7(uint32_t TickPriority) {
   RCC_ClkInitTypeDef clkconfig;
   uint32_t uwTimclock = 0;
@@ -121,18 +122,20 @@ static HAL_StatusTypeDef init_TIM7(uint32_t TickPriority) {
 }
 
 
-
+/// Called by HAL to init the timer
 HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority) {
   uwTickPrio = TickPriority;
   return init_TIM7(TickPriority);
 }
 
 
+/// Called by HAL to pause the timer
 void HAL_SuspendTick(void) {
   __HAL_TIM_DISABLE_IT(&htim7, TIM_IT_UPDATE);
 }
 
 
+/// Called by HAL to resume the timer
 void HAL_ResumeTick(void) {
   __HAL_TIM_ENABLE_IT(&htim7, TIM_IT_UPDATE);
 }

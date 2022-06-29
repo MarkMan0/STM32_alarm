@@ -1,3 +1,6 @@
+/**
+ * @file parser_test.cpp
+ */
 #include "command_parser.h"
 #include "unity.h"
 

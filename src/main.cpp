@@ -1,6 +1,6 @@
 /**
  * @file main.cpp
- * @brief Program entry point
+ * @brief Program entry point and global objects declaration
  *
  */
 
@@ -19,14 +19,15 @@
 #include "stm_config.h"
 #include "tasks.h"
 
-
+/// @name Global objects declaration
+/// @{
 
 UART_DMA uart2(UART_DMA::uart2_hw_init, UART_DMA::uart2_enable_isrs);
 RTOS_I2C i2c;
 DS3231 rtc(i2c);
-CommandDispatcher cmd(&uart2);
 RotaryEncoder encoder;
 
+/// @}
 
 int main(void) {
   HAL_Init();
@@ -35,7 +36,7 @@ int main(void) {
 
   /// initialize global hardware objects
   uart2.hw_init(115200);
-  i2c.init_i2c1();
+  RTOS_I2C::init_i2c1(&i2c);
 
   pin_mode(pins::enc_A, pin_mode_t::IT_RISE_FALL_PU);
   pin_mode(pins::enc_B, pin_mode_t::INPUT_PU);
@@ -53,7 +54,6 @@ int main(void) {
   /// Initialize RTOS objects and tasks
 
   rtos_obj::gpio_queue = xQueueCreate(10, sizeof(GPIOStateContainer));
-  rtos_obj::btn_event_queue = xQueueCreate(3, sizeof(btn_event_t));
 
   uart2.begin(&rtos_obj::uart2_tx_handle);
   xTaskCreate(rtos_tasks::gpio_task, "GPIO task", 128, nullptr, 20, &rtos_obj::gpio_handle);

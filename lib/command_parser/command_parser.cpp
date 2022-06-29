@@ -1,3 +1,7 @@
+/**
+ * @file command_parser.cpp
+ */
+
 #include "command_parser.h"
 #include <array>
 #include <cstring>

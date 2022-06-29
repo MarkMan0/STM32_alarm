@@ -4,7 +4,10 @@
 #include "task.h"
 #include "unity.h"
 
+/// Tests have to implement this task
 extern void test_task(void*);
+
+/// If implemented, will be called before starting the scheduler
 extern void pre_test();
 
 
@@ -34,8 +37,7 @@ __weak void setUp() {
 }
 __weak void tearDown() {
 }
-
-__attribute__((weak)) void pre_test() {
+__weak void pre_test() {
 }
 
 void SystemClock_Config(void) {

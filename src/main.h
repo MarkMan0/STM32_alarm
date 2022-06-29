@@ -1,3 +1,7 @@
+/**
+ * @file main.h
+ * @brief Correctly includes the HAL libraries
+ */
 #pragma once
 
 #ifdef __cplusplus

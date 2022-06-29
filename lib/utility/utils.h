@@ -4,6 +4,8 @@
 #include "semphr.h"
 
 namespace utils {
+
+  /// @brief RAII lock for RTOS mutex
   struct Lock {
   private:
     const SemaphoreHandle_t mtx_{ nullptr };
@@ -30,6 +32,7 @@ namespace utils {
     }
   };
 
+  /// @brief RAII lock for RTOS mutex from ISR context
   struct LockISR {
   private:
     const SemaphoreHandle_t mtx_{};

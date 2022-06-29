@@ -1,3 +1,7 @@
+/**
+ * @file display_objects.h
+ * @brief Global objects private to the display task
+ */
 #pragma once
 #include "SSD1306.h"
 #include "GFX.h"

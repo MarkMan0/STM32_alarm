@@ -1,3 +1,9 @@
+/**
+ * @file simple_i2c.h
+ * @brief wrapper around HAL_I2C functions
+ *
+ */
+
 #pragma once
 
 #include "main.h"

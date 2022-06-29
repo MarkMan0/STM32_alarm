@@ -1,6 +1,6 @@
 /**
  * @file unity_config.cpp
- * @brief unity test framework conector with board and with PC via UART2
+ * @brief unity test framework connector with board and with PC via UART2
  */
 #include "unity_config.h"
 #include "../src/main.h"

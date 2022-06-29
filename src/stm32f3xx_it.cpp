@@ -73,6 +73,7 @@ void TIM7_DAC2_IRQHandler(void) {
   HAL_TIM_IRQHandler(&htim7);
 }
 
+/// reads pins A and B for encoder, and sends to handler task
 void EXTI4_IRQHandler(void) {
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
   GPIOStateContainer gpio{ 0 };
@@ -81,7 +82,7 @@ void EXTI4_IRQHandler(void) {
   xQueueSendFromISR(rtos_obj::gpio_queue, &gpio, NULL);
 }
 
-
+/// Reads encoder button, and sends to handler task
 void EXTI1_IRQHandler(void) {
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_1);
   GPIOStateContainer gpio{ 0 };

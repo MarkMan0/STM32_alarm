@@ -1,3 +1,8 @@
+/**
+ * @file weak_commands.cpp
+ * @brief Empty commands implemented as __weak, to avoid linker error while testing
+ *
+ */
 #include "command_parser.h"
 
 

@@ -1,3 +1,9 @@
+/**
+ * @file tasks.cpp
+ * @brief Simple or miscellaneous tasks
+ *
+ */
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "globals.h"
@@ -10,7 +16,6 @@ namespace rtos_obj {
   QueueHandle_t gpio_queue;
   QueueHandle_t btn_event_queue;
   TaskHandle_t display_handle;
-  TaskHandle_t led_handle;
   TaskHandle_t command_handle;
   TaskHandle_t gpio_handle;
   TaskHandle_t monitor_handle;
@@ -20,6 +25,7 @@ namespace rtos_obj {
 
 
 void rtos_tasks::command_task(void*) {
+  static CommandDispatcher cmd(&uart2);
   while (1) {
     xTaskNotifyWait(0, UINT32_MAX, nullptr, portMAX_DELAY);
 
@@ -34,13 +40,13 @@ void rtos_tasks::command_task(void*) {
 void rtos_tasks::gpio_task(void*) {
   GPIOStateContainer cont{ 0 };
 
+  /// Timeout for task is based on the current event of the button
   TickType_t next_timeout = portMAX_DELAY;
 
   while (1) {
     uint32_t ms{ 0 };
-    uart2.printf("GPIO_TASK\n");
     if (pdPASS == xQueueReceive(rtos_obj::gpio_queue, &cont, next_timeout)) {
-      // new data
+      /// new data received for GPIO, pass it to classes
       if (cont.pin_A & 2 && cont.pin_B & 2) {
         encoder.enc.update(cont.pin_A & 1, cont.pin_B & 1);
       }
@@ -48,15 +54,18 @@ void rtos_tasks::gpio_task(void*) {
         ms = encoder.btn.update_btn(cont.pin_SW & 1);
       }
     } else {
+      /// timeout elapsed, call update on button to track state
       ms = encoder.btn.update_btn(cont.pin_SW & 1);
     }
 
+    /// ms will be non-zero, if this task should be called without user input
     if (ms) {
       next_timeout = pdMS_TO_TICKS(ms);
     } else {
       next_timeout = portMAX_DELAY;
     }
 
+    /// Something happened, notify the UI task
     xTaskNotify(rtos_obj::display_handle, 0, eNoAction);
   }
 }
@@ -64,11 +73,14 @@ void rtos_tasks::gpio_task(void*) {
 
 
 void rtos_tasks::monitor_task(void*) {
-  vTaskDelay(pdMS_TO_TICKS(10000));  // wait for all tasks to start
+  /// wait for all tasks to start
+  vTaskDelay(pdMS_TO_TICKS(10000));
   const auto num_of_tasks = uxTaskGetNumberOfTasks();
 
+  /// Dynamic allocation of space for status of all tasks
   auto statuses = static_cast<TaskStatus_t*>(pvPortMalloc(num_of_tasks * sizeof(TaskStatus_t)));
 
+  /// if task stack is ever lower than this many bytes, a warning is generated
   constexpr size_t memory_low_th{ 20 };
   while (1) {
     if (auto n = uxTaskGetSystemState(statuses, num_of_tasks, NULL)) {
@@ -90,7 +102,7 @@ void rtos_tasks::monitor_task(void*) {
 }
 
 
-
+/// Called by freertos on stack overflow in any task
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char* pcTaskName) {
   static std::array<char, 50> buff;
   npf_snprintf(buff.data(), buff.size() - 1, "OVERFLOW: %s", pcTaskName);

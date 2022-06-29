@@ -1,3 +1,7 @@
+/**
+ * @file uart_tests.h
+ * @brief UART test declarations
+ */
 #pragma once
 
 #include "uart.h"

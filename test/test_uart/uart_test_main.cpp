@@ -1,3 +1,7 @@
+/**
+ * @file uart_test_main.cpp
+ * @brief UART1 test one-time setup and ISRs
+ */
 #include "../main.h"
 #include "uart_tests.h"
 #include <unity.h>

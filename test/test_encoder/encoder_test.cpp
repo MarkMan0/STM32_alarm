@@ -1,3 +1,6 @@
+/**
+ * @file encoder_test.cpp
+ */
 #include "../main.h"
 #include "unity.h"
 #include "encoder.h"
@@ -27,7 +30,7 @@ void setUp() {
   enc.init(0);
 }
 
-
+/// Test increment from 0-0 state
 void test_inc_from_0() {
   enc.init(0);
   TEST_ASSERT_EQUAL(0, enc.get());
@@ -39,6 +42,7 @@ void test_inc_from_0() {
   TEST_ASSERT_EQUAL(2, enc.get());
 }
 
+/// Test increment from 1-1 state
 void test_inc_from_1() {
   enc.init(1);
   TEST_ASSERT_EQUAL(0, enc.get());
@@ -50,6 +54,7 @@ void test_inc_from_1() {
   TEST_ASSERT_EQUAL(2, enc.get());
 }
 
+/// Test decrement from 0-0 state
 void test_dec_from_0() {
   enc.init(0);
   TEST_ASSERT_EQUAL(0, enc.get());
@@ -61,6 +66,7 @@ void test_dec_from_0() {
   TEST_ASSERT_EQUAL(-2, enc.get());
 }
 
+/// Test decrement from 1-1 state
 void test_dec_from_1() {
   enc.init(1);
   TEST_ASSERT_EQUAL(0, enc.get());

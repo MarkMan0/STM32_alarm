@@ -8,6 +8,12 @@
 #include <cstdint>
 #include <array>
 
+/**
+ * @brief Non-overwriting ring buffer implementation
+ *
+ * @tparam T type in buffer
+ * @tparam N number of elements in buffer
+ */
 template <class T = uint8_t, uint16_t N = 64>
 class RingBuffer {
 public:
@@ -16,6 +22,7 @@ public:
   uint16_t head_{}, tail_{};
   bool is_full_ = false;
 
+  /// Place and element into the buffer
   uint16_t push(const data_t& d) {
     if (is_full()) {
       return 0;
@@ -27,6 +34,8 @@ public:
     return 1;
   }
 
+  /// Place @p n elements into the buffer
+  /// @return Number of elements written
   uint16_t push(const T* data, uint16_t n) {
     int cnt = 0;
     for (; cnt < n && not is_full(); ++cnt) {
@@ -37,6 +46,7 @@ public:
     return cnt;
   }
 
+  /// Take one element from the buffer
   [[nodiscard]] data_t pop() {
     assert_param(!is_empty());
 
@@ -46,12 +56,14 @@ public:
     return ret;
   }
 
+  /// Move tail_ pointer by @p n. Essentially deletes the elements
   void pop(size_t n) {
     assert_param(!is_empty());
     tail_ = (tail_ + n) % N;
     is_full_ = false;
   }
 
+  /// First element in the buffer
   [[nodiscard]] const data_t& peek() const {
     assert_param(!is_empty());
     return buff_[tail_];
@@ -76,6 +88,7 @@ public:
     }
   }
 
+  /// size of continuously occupied space after tail_
   [[nodiscard]] uint16_t get_num_occupied_continuous() const {
     if (head_ < tail_) {
       return N - tail_;
@@ -88,6 +101,7 @@ public:
     return N - get_num_occupied();
   }
 
+  /// size of continuous free space after head_
   [[nodiscard]] uint16_t get_num_free_continuous() const {
     if (head_ < tail_) {
       return tail_ - head_;
@@ -97,6 +111,7 @@ public:
   }
 
   /// @brief Moves head by @p n, if @p n number of continuous space is available
+  /// @returns pointer to beginning of the reserved space
   [[nodiscard]] data_t* reserve(uint16_t n) {
     if (get_num_free_continuous() < n) {
       return nullptr;
@@ -155,6 +170,7 @@ public:
   /// @}
 
   /// @brief move head position by N
+  /// Used if data was written externally, e.g. by the DMA
   void advance_head(size_t n) {
     for (unsigned i = 0; i < n; ++i) {
       // data is written by DMA, so if full, data is overwritten, which shouldn't happen

@@ -62,6 +62,7 @@ void GFX::draw() {
 void GFX::clear_canvas() {
   // we can use memset instead of a double for
   memset(canvas_.data(), 0, 128 * 8);
+  move_cursor({ 0, 0 });
 }
 
 
@@ -199,86 +200,6 @@ void GFX::printf(const char* fmt, ...) {
   va_end(args);
 }
 
-
-void GFX::vprintf(const char* fmt, va_list args) {
-  enum Format_state { NO_FORMAT, SEEN_PERCENT, FORMAT_D, FORMAT_S, FORMAT_C, BAD_FORMAT };
-  Format_state fmt_state{ NO_FORMAT };
-  bool render_state{ true };
-
-  auto rndr = [&render_state, this](char c) { render_one(c, 8, render_state); };
-
-  auto render_int = [&rndr, this](int num) {
-    if (num < 0) {
-      rndr('-');
-      num = abs(num);
-    }
-    int place = 10000;
-    bool skipping_zeros{ true };
-    while (place) {
-      int num_at_place = (num - (num % place)) / place;
-      if (num_at_place) {
-        skipping_zeros = false;
-      }
-      num = num % place;
-      place /= 10;
-      if (!skipping_zeros || place == 0) {
-        // draw at least one zero
-        rndr('0' + num_at_place);
-      }
-    }
-  };
-
-  while (*fmt || fmt_state == FORMAT_D || fmt_state == FORMAT_S || fmt_state == FORMAT_C) {
-    switch (fmt_state) {
-      case NO_FORMAT: {
-        if (*fmt == '%') {
-          fmt_state = SEEN_PERCENT;
-        } else {
-          rndr(*fmt);
-        }
-        ++fmt;
-        break;
-      }
-      case SEEN_PERCENT: {
-        if (*fmt == 'd' || *fmt == 'i') {
-          fmt_state = FORMAT_D;
-        } else if (*fmt == 's') {
-          fmt_state = FORMAT_S;
-        } else if (*fmt == '%') {
-          fmt_state = NO_FORMAT;
-          rndr('%');
-        } else if (*fmt == 'c') {
-          fmt_state = FORMAT_C;
-        } else {
-          fmt_state = BAD_FORMAT;
-        }
-        ++fmt;
-        break;
-      }
-      case FORMAT_D: {
-        int val = va_arg(args, int);
-        render_int(val);
-        fmt_state = NO_FORMAT;
-        break;
-      }
-      case FORMAT_S: {
-        const char* str = va_arg(args, const char*);
-        draw_text(str);
-        fmt_state = NO_FORMAT;
-        break;
-      }
-      case FORMAT_C: {
-        char c = va_arg(args, int);
-        rndr(c);
-        fmt_state = NO_FORMAT;
-        break;
-      }
-      case BAD_FORMAT: {
-        return;
-      }
-    }
-  }
-}
 
 void GFX::putc(int c, void* ptr) {
   GFX& gfx = *reinterpret_cast<GFX*>(ptr);

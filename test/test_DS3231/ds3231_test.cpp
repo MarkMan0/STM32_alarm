@@ -1,3 +1,6 @@
+/**
+ * @file ds3231_test.cpp
+ */
 #include "../main.h"
 #include "DS3231.h"
 #include "unity.h"
@@ -13,6 +16,7 @@ std::optional<DS3231::time> orig_time;
 std::optional<DS3231::alarm_t> alarm0, alarm1;
 uint32_t start_ms{};
 
+/// Save current time before each test
 void setUp() {
   DS3231::time t;
   DS3231::alarm_t a;
@@ -35,6 +39,7 @@ void setUp() {
   can_test = orig_time && alarm0 && alarm1;
 }
 
+/// Calculate elapsed time during test, and set RTC to correct time
 void tearDown() {
   if (orig_time) {
     DS3231::time t = *orig_time;
@@ -57,7 +62,7 @@ void tearDown() {
   }
 }
 
-
+/// Test setting and getting time
 void test_ds3231() {
   DS3231::time t;
 
@@ -89,7 +94,7 @@ void test_ds3231() {
   TEST_ASSERT_EQUAL_MESSAGE(2010, t.year, "Year wrong");
 }
 
-
+/// Test setting and triggering alarm. Can take up to a minute
 void test_alarm() {
   DS3231::alarm_t alarm;
   DS3231::time t;
@@ -134,7 +139,7 @@ void test_alarm() {
 
 
 int test_task(void*) {
-  i2c1.init_i2c1();
+  RTOS_I2C::init_i2c1(&i2c1);
 
   UNITY_BEGIN();
 

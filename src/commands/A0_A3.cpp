@@ -32,9 +32,9 @@ void CommandDispatcher::A1() {
     return;
   }
 
-  auto set_from_param = [](auto& what, char p) {
+  auto set_from_param = [&](auto& what, char p) {
     int16_t val;
-    if (cmd.parser_.get_parameter(p, val)) {
+    if (parser_.get_parameter(p, val)) {
       what = val;
     }
   };
@@ -82,9 +82,9 @@ void CommandDispatcher::A2() {
 
   const int n = val;
 
-  auto set_from_param = [](auto& what, char p) {
+  auto set_from_param = [&](auto& what, char p) {
     int16_t val;
-    if (cmd.parser_.get_parameter(p, val)) {
+    if (parser_.get_parameter(p, val)) {
       what = val;
     }
   };
