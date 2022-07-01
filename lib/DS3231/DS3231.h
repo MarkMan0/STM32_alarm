@@ -76,6 +76,9 @@ public:
   /// Check and clear alarm flag in DS3231 for alarm @p n. Result stored in @p b
   [[nodiscard]] uint8_t get_and_clear_alarm_flag(int n, bool& b);
 
+  /// Read the temperature from the DS3231 into @p f
+  [[nodiscard]] uint8_t read_temperature(float& f);
+
 private:
   static inline constexpr uint8_t i2c_address_{ 0b1101000 << 1 };  ///< The I2C address of the RTC, already shifted
   const char* dow_to_str(uint8_t dow) const;                       ///< day of the week as string

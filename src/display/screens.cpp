@@ -18,8 +18,19 @@ void MainScreen::draw() {
     constexpr int len = 8 * (2 + 1 + 2 + 1 + 2);
     gfx.move_cursor({ 127 - len, 0 });
     gfx.printf("%02d:%02d:%02d", t.hour, t.min, t.sec);
+
+    gfx.move_cursor({ 0, 1 });
+    gfx.printf("%d.%2d.%4d", t.date, t.month, t.year);
+    gfx.printf(" %.*s", 3, t.dow_str);
   } else {
+    gfx.move_cursor({ 0, 1 });
     gfx.printf("ERR rtc");
+  }
+
+  float f = 0;
+  if (0 == rtc.read_temperature(f)) {
+    gfx.move_cursor({ 0, 0 });
+    gfx.printf("%d C", static_cast<int>(f));
   }
 
   gfx.move_cursor({ 0, 2 });

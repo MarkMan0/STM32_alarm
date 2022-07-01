@@ -358,3 +358,20 @@ uint8_t DS3231::get_and_clear_alarm_flag(int n, bool& b) {
 
   return 0;
 }
+
+
+uint8_t DS3231::read_temperature(float& f) {
+  uint8_t buff[2] = { 0 };
+  if (not i2c_dev_.read_register(i2c_address_, DS3231Reg::TEMP_MSB, buff, 2)) {
+    return 1;
+  }
+
+  int16_t int_port = (buff[0]);
+  int16_t frac_port = (buff[1] >> 6);
+
+  f = int_port + 0.25 * frac_port;
+
+
+
+  return 0;
+}
