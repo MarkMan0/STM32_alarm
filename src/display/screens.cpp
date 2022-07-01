@@ -16,7 +16,7 @@ void MainScreen::draw() {
   if (0 == rtc.get_time(t)) {
     // length of the time string 00:00:00
     constexpr int len = 8 * (2 + 1 + 2 + 1 + 2);
-    gfx.move_cursor({ 128 - len, 0 });
+    gfx.move_cursor({ 127 - len, 0 });
     gfx.printf("%02d:%02d:%02d", t.hour, t.min, t.sec);
   } else {
     gfx.printf("ERR rtc");

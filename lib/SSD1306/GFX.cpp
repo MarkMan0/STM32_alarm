@@ -176,7 +176,7 @@ void GFX::render_one(char c, uint8_t increment, bool& state) {
 
   render_glyph(cursor_, c);
   cursor_.x_ += increment;
-  if (cursor_.x_ >= 127 - increment) {
+  if (cursor_.x_ > 127 - increment) {
     // next char won't fit
     cursor_.x_ = 0;
     cursor_.y_++;
