@@ -23,10 +23,11 @@ UART_DMA::UART_DMA(hw_init_fcn_t* a, isr_enable_fcn_t* b) : hw_init_cb(a), isr_e
 void UART_DMA::hw_init(uint32_t baud) {
   baudrate_ = baud;
   hw_init_cb(*this);
-  isr_enable_cb(*this);
 }
 
 void UART_DMA::begin(TaskHandle_t* tx_task) {
+  isr_enable_cb(*this);
+
   tx_buff_mtx_ = xSemaphoreCreateBinary();
   xSemaphoreGive(tx_buff_mtx_);
   xTaskCreate(generic_tx_task, "tx task", 60, this, 20, &tx_task_);
