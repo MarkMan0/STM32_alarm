@@ -366,8 +366,8 @@ uint8_t DS3231::read_temperature(float& f) {
     return 1;
   }
 
-  int16_t int_port = (buff[0]);
-  int16_t frac_port = (buff[1] >> 6);
+  int8_t int_port = *reinterpret_cast<int8_t*>(&(buff[0]));
+  uint8_t frac_port = (buff[1] >> 6);
 
   f = int_port + 0.25 * frac_port;
 
