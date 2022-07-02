@@ -38,10 +38,10 @@ bool MainMenuScreen::onClickUp() {
       menu.goto_screen(ScreenAllocator::allocate(MainScreen()));
       break;
     case 1:
-      menu.goto_screen(ScreenAllocator::allocate(Screen2()));
+      menu.goto_screen(ScreenAllocator::allocate(SetAlarmScreen(0)));
       break;
     case 2:
-      menu.goto_screen(ScreenAllocator::allocate(Screen3()));
+      menu.goto_screen(ScreenAllocator::allocate(SetAlarmScreen(1)));
       break;
     case 3:
       menu.goto_screen(ScreenAllocator::allocate(Screen4()));

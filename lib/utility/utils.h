@@ -74,4 +74,11 @@ namespace utils {
     return static_cast<int32_t>(now - next) >= 0;
   }
 
+  template <class T>
+  inline constexpr T sign(T val) {
+    if (val > 0) return 1;
+    if (val < 0) return -1;
+    return 0;
+  }
+
 }  // namespace utils

@@ -33,7 +33,7 @@ void MainScreen::draw() {
     gfx.printf("%d C", static_cast<int>(f));
   }
 
-  gfx.move_cursor({ 0, 2 });
+  gfx.move_cursor({ 0, 3 });
   for (int i = 0; i < 2; ++i) {
     DS3231::alarm_t alarm;
     gfx.printf("Alarm %d ", i);
@@ -61,32 +61,6 @@ bool MainScreen::onClickUp() {
   return true;
 }
 
-
-void Screen2::draw() {
-  gfx.clear_canvas();
-  gfx.move_cursor({ 0, 2 });
-  gfx.printf("Screen2 screen\n%d", counter_);
-  gfx.draw();
-}
-bool Screen2::onClickUp() {
-  menu.goto_screen(ScreenAllocator::allocate(MainScreen()));
-  return true;
-}
-bool Screen2::onClickHeld() {
-  ++counter_;
-  return true;
-}
-
-void Screen3::draw() {
-  gfx.clear_canvas();
-  gfx.move_cursor({ 0, 2 });
-  gfx.printf("Screen3 screen");
-  gfx.draw();
-}
-bool Screen3::onClickUp() {
-  menu.goto_screen(ScreenAllocator::allocate(MainScreen()));
-  return true;
-}
 
 void Screen4::draw() {
   gfx.clear_canvas();
