@@ -59,3 +59,10 @@ Platformio allows for easy testing of libraries, directly on the hardware. Test 
 
 ### Task layout
 ![Task layout](images/tasks.png "Task layout")
+
+
+## Hardware
++ [NUCLEO-F303K8](https://www.st.com/en/evaluation-tools/nucleo-f303k8.html)
++ [DS3231 breakout board](https://www.electrodragon.com/product/ds3231-rtc-breakout-board-r2/)
++ [SSD1306 OLED display](https://www.electronicwings.com/sensors-modules/ssd1306-oled-display)
++ [Rotary encoder](https://howtomechatronics.com/tutorials/arduino/rotary-encoder-works-use-arduino/)
