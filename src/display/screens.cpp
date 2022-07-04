@@ -94,9 +94,6 @@ void AlarmScreen::draw() {
     blink_flag_ = not blink_flag_;
   }
 
-  constexpr int x_marg = 10;
-  constexpr int y_marg = 8 * 2;
-
   gfx.draw_rectangle({ 0, 8 * 2 }, { 127, 63 }, border);
   gfx.draw_rectangle({ 0, 0 }, { 127, 8 * 2 }, false);
 
