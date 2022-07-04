@@ -26,4 +26,5 @@ struct GPIOStateContainer {
   uint8_t pin_A : 2;
   uint8_t pin_B : 2;
   uint8_t pin_SW : 2;
+  uint8_t pin_alarm : 2;
 };

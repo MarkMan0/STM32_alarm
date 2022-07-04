@@ -89,3 +89,13 @@ void EXTI1_IRQHandler(void) {
   gpio.pin_SW = 2 | read_pin(pins::enc_SW);
   xQueueSendFromISR(rtos_obj::gpio_queue, &gpio, NULL);
 }
+
+/// Alarm interrupt
+void EXTI9_5_IRQHandler(void) {
+  GPIOStateContainer gpio{ 0 };
+  if (read_pin(pins::alarm_it) == 0) {
+    HAL_GPIO_EXTI_IRQHandler(pin_api::pin_name_to_num(pins::alarm_it));
+    gpio.pin_alarm = 2 | 0;  // is 0 because of the if()
+    xQueueSendFromISR(rtos_obj::gpio_queue, &gpio, NULL);
+  }
+}

@@ -23,6 +23,7 @@ void rtos_tasks::ui_task(void* ptr_in) {
 
   TickType_t timeout = pdMS_TO_TICKS(100);
   bool was_sleeping = false;
+  bool is_alarm = false;
   while (1) {
     if (pdPASS == xTaskNotifyWait(0, UINT32_MAX, nullptr, timeout)) {
       // Got an event, reset turn off timeout
@@ -32,6 +33,10 @@ void rtos_tasks::ui_task(void* ptr_in) {
         // only call begin once
         display.begin();
         was_sleeping = false;
+      }
+
+      if (read_pin(pins::alarm_it) == 0) {
+        is_alarm = true;
       }
     }
     if (utils::elapsed(HAL_GetTick(), next_sleep)) {
@@ -44,6 +49,16 @@ void rtos_tasks::ui_task(void* ptr_in) {
       was_sleeping = true;
     } else {
       // refresh, if turn off timeout hasn't elapsed yet
+
+      if (is_alarm) {
+        is_alarm = false;
+        bool b = false;
+        if (0 == rtc.get_and_clear_alarm_flag(0, b)) {
+          menu.goto_screen(ScreenAllocator::allocate(AlarmScreen()));
+        }
+      }
+
+
       menu.tick();
     }
   }

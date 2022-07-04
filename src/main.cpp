@@ -41,6 +41,8 @@ int main(void) {
   pin_mode(pins::enc_A, pin_mode_t::IT_RISE_FALL_PU);
   pin_mode(pins::enc_B, pin_mode_t::INPUT_PU);
   pin_mode(pins::enc_SW, pin_mode_t::IT_RISE_FALL_PU);
+  pin_mode(pins::alarm_it, pin_mode_t::IT_FALLING_PU);
+
 
   encoder.enc.init(read_pin(pins::enc_A));
 
@@ -50,6 +52,9 @@ int main(void) {
 
   HAL_NVIC_SetPriority(EXTI4_IRQn, 6, 0);
   HAL_NVIC_EnableIRQ(EXTI4_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 6, 0);
+  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
   /// Initialize RTOS objects and tasks
 

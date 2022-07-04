@@ -27,7 +27,7 @@ public:
   bool onClickUp() override;
 
 private:
-  static constexpr const char* menu_items[] = { "Back", "Set alarm 1", "Set alarm 2", "Screen 4" };
+  static constexpr const char* menu_items[] = { "Back", "Set alarm 1", "Set alarm 2", "Alarm" };
   static constexpr unsigned num_items = sizeof(menu_items) / sizeof(menu_items[0]);
 
   unsigned current_item_ = 0;
@@ -62,10 +62,17 @@ private:
 
 
 /// Example screen
-class Screen4 : public AbstractScreen {
+class AlarmScreen : public AbstractScreen {
 public:
-  void draw() override;
-  bool onClickUp() override;
+  void onEntry() override;    ///< start blinking of LED
+  void onExit() override;     ///< stop blinking of LED
+  void draw() override;       ///< blinking alarm screen
+  bool onClickUp() override;  ///< end alarm
+
+private:
+  bool blink_flag_ = false;
+  uint32_t next_blink_ = 0;
+  int alarm_no_{ 0 };
 };
 
 
@@ -78,7 +85,7 @@ public:
 class ScreenAllocator {
 public:
   /// std::variant type, that can store any of the available screens.
-  using screen_collection_t = std::variant<MainScreen, MainMenuScreen, SetAlarmScreen, Screen4>;
+  using screen_collection_t = std::variant<MainScreen, MainMenuScreen, SetAlarmScreen, AlarmScreen>;
 
   /**
    * @brief Allocate a screen of type T()

@@ -53,6 +53,11 @@ void rtos_tasks::gpio_task(void*) {
       if (cont.pin_SW & 2) {
         ms = encoder.btn.update_btn(cont.pin_SW & 1);
       }
+      if (cont.pin_alarm & 2 && not(cont.pin_alarm & 1)) {
+        // alarm
+        /// @todo use queues with events to signal display task, not notification
+      }
+
     } else {
       /// timeout elapsed, call update on button to track state
       ms = encoder.btn.update_btn(cont.pin_SW & 1);

@@ -62,13 +62,48 @@ bool MainScreen::onClickUp() {
 }
 
 
-void Screen4::draw() {
-  gfx.clear_canvas();
-  gfx.move_cursor({ 0, 2 });
-  gfx.printf("Screen4 screen");
-  gfx.draw();
+static void start_led_blink() {
 }
-bool Screen4::onClickUp() {
+
+static void stop_led_blink() {
+}
+
+void AlarmScreen::onEntry() {
+  start_led_blink();
+  next_blink_ = HAL_GetTick() + 500;
+}
+
+void AlarmScreen::onExit() {
+  stop_led_blink();
+}
+
+
+bool AlarmScreen::onClickUp() {
   menu.goto_screen(ScreenAllocator::allocate(MainScreen()));
   return true;
+}
+
+void AlarmScreen::draw() {
+  gfx.clear_canvas();
+
+  bool border = blink_flag_;
+
+  if (utils::elapsed(HAL_GetTick(), next_blink_)) {
+    next_blink_ = HAL_GetTick() + 500;
+    blink_flag_ = not blink_flag_;
+  }
+
+  constexpr int x_marg = 10;
+  constexpr int y_marg = 8 * 2;
+
+  gfx.draw_rectangle({ 0, 8 * 2 }, { 127, 63 }, border);
+  gfx.draw_rectangle({ 0, 0 }, { 127, 8 * 2 }, false);
+
+  int len = npf_snprintf(NULL, 0, "Alarm %d", alarm_no_);
+
+  int start_pos = 127 - (8 * len) * 3 / 2;
+  gfx.move_cursor({ start_pos, 0 });
+  gfx.printf("Alarm %d", alarm_no_);
+
+  gfx.draw();
 }
