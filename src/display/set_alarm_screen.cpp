@@ -121,6 +121,8 @@ void SetAlarmScreen::onEncoder(int32_t inc) {
     increment(alarm_.dow, 0, 7);
     if (alarm_.dow != 0) {
       alarm_.alarm_type = DS3231::alarm_t::ON_DOW;
+    } else {
+      alarm_.alarm_type = DS3231::alarm_t::DAILY;
     }
   }
   if (editing_hour_) {
