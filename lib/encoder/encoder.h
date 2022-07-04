@@ -171,11 +171,11 @@ public:
 
 
 
-private:
-  static constexpr uint32_t HELD_DELAY = 300;        ///< Delay after Held is reported
-  static constexpr uint32_t DEBOUNCE_DELAY = 10;     ///< Delay to debounce the button
+  static constexpr uint32_t HELD_DELAY = 600;        ///< Delay after Held is reported
+  static constexpr uint32_t DEBOUNCE_DELAY = 20;     ///< Delay to debounce the button
   static constexpr bool DOWN_STATE = PRESSED_STATE;  ///< The state of the pin when pressed
 
+private:
   uint32_t event_time_{};  ///< ms since start of program for next event @see utils::elapsed(uint32_t, uint32_t)
 
   bool press_event_{ false }, held_event_{ false }, release_event_{ false };
