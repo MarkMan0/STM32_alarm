@@ -72,7 +72,7 @@ void SetAlarmScreen::draw() {
 
 
 bool SetAlarmScreen::onClickUp() {
-  menu.goto_screen(ScreenAllocator::allocate(MainMenuScreen()));
+  menu.goto_screen(ScreenAllocator::allocate<MainMenuScreen>());
   return true;
 }
 

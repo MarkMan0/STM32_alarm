@@ -3,7 +3,7 @@
 
 
 void Menu::init() {
-  curr_screen_ = ScreenAllocator::allocate(MainScreen());
+  curr_screen_ = ScreenAllocator::allocate<MainScreen>();
   curr_screen_->onEntry();
 }
 

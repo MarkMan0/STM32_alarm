@@ -7,7 +7,6 @@
 #pragma once
 
 #include "abstract_screen.h"
-#include <variant>
 #include "DS3231.h"
 #include <algorithm>
 
@@ -64,6 +63,8 @@ private:
 /// Example screen
 class AlarmScreen : public AbstractScreen {
 public:
+  AlarmScreen(int n) : alarm_no_(n) {
+  }
   void onEntry() override;    ///< start blinking of LED
   void onExit() override;     ///< stop blinking of LED
   void draw() override;       ///< blinking alarm screen
@@ -76,6 +77,16 @@ private:
 };
 
 
+/**
+ * @brief Return the maximum sizeof of it's template parameters
+ *
+ * @tparam Ts list of classes/objects
+ * @return constexpr size_t size of biggest object in bytes
+ */
+template <class... Ts>
+inline constexpr size_t get_max_size() {
+  return std::max({ sizeof(Ts)... });
+}
 
 /**
  * @brief Stores 2 screens in memory. On allocate, doesn't destroy the previous
@@ -84,32 +95,28 @@ private:
  */
 class ScreenAllocator {
 public:
-  /// std::variant type, that can store any of the available screens.
-  using screen_collection_t = std::variant<MainScreen, MainMenuScreen, SetAlarmScreen, AlarmScreen>;
+  /// storage size in bytes
+  static constexpr uint32_t mem_sz = get_max_size<MainScreen, MainMenuScreen, SetAlarmScreen, AlarmScreen>();
+  static uint8_t storage_1_[mem_sz], storage_2_[mem_sz];  ///< Screen storages
+  static bool flag_;                                      ///< determines which storage will be used
 
+public:
   /**
-   * @brief Allocate a screen of type T()
-   * @brief Screen is stored in an alternating pattern in two storages.
-   * @tparam T type of screen, must be part of screen_collection_t
-   * @param t moving is used to put this into storage
-   * @return AbstractScreen* pointer to the newly allocated memory
+   * @brief Construct a screen in preallocated static memory
+   *
+   * @tparam T type of screen
+   * @tparam Args
+   * @param args args of constructor of @p t
+   * @return AbstractScreen* pointer to allocated screen
    */
-  template <class T>
-  static AbstractScreen* allocate(T&& t) {
-    // pointer will be stored here
-    AbstractScreen* ptr;
-    // get reference to collection based on flag
-    auto& coll = flag_ ? coll_1_ : coll_2_;
-    // negate flag so next call is to other collection
-    flag_ = not flag_;
-    // put @p t into collection
-    coll = std::move(t);
-    // get the pointer to the stored screen
-    std::visit([&](auto& arg) { ptr = &arg; }, coll);
-    return ptr;
-  }
+  template <class T, class... Args>
+  static AbstractScreen* allocate(Args&&... args) {
+    static_assert(sizeof(T) <= mem_sz);
 
-private:
-  static bool flag_;                            ///< determines which storage will be used
-  static screen_collection_t coll_1_, coll_2_;  ///< Screen storages
+    void* const ptr = flag_ ? storage_1_ : storage_2_;
+    flag_ = not flag_;
+
+    new (ptr) T(std::forward<Args>(args)...);
+    return reinterpret_cast<AbstractScreen*>(ptr);
+  }
 };

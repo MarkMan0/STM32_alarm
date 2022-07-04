@@ -54,7 +54,7 @@ void rtos_tasks::ui_task(void* ptr_in) {
         is_alarm = false;
         bool b = false;
         if (0 == rtc.get_and_clear_alarm_flag(0, b)) {
-          menu.goto_screen(ScreenAllocator::allocate(AlarmScreen()));
+          menu.goto_screen(ScreenAllocator::allocate<AlarmScreen>(0));
         }
       }
 

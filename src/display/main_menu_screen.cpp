@@ -35,16 +35,16 @@ void MainMenuScreen::onEncoder(int32_t increment) {
 bool MainMenuScreen::onClickUp() {
   switch (current_item_) {
     case 0:
-      menu.goto_screen(ScreenAllocator::allocate(MainScreen()));
+      menu.goto_screen(ScreenAllocator::allocate<MainScreen>());
       break;
     case 1:
-      menu.goto_screen(ScreenAllocator::allocate(SetAlarmScreen(0)));
+      menu.goto_screen(ScreenAllocator::allocate<SetAlarmScreen>(0));
       break;
     case 2:
-      menu.goto_screen(ScreenAllocator::allocate(SetAlarmScreen(1)));
+      menu.goto_screen(ScreenAllocator::allocate<SetAlarmScreen>(1));
       break;
     case 3:
-      menu.goto_screen(ScreenAllocator::allocate(AlarmScreen()));
+      menu.goto_screen(ScreenAllocator::allocate<AlarmScreen>(0));
       break;
     default:
       break;

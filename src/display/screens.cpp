@@ -6,7 +6,8 @@
 
 
 bool ScreenAllocator::flag_{ false };
-ScreenAllocator::screen_collection_t ScreenAllocator::coll_1_, ScreenAllocator::coll_2_;
+uint8_t ScreenAllocator::storage_1_[ScreenAllocator::mem_sz];
+uint8_t ScreenAllocator::storage_2_[ScreenAllocator::mem_sz];
 
 
 void MainScreen::draw() {
@@ -57,7 +58,7 @@ void MainScreen::draw() {
 
 
 bool MainScreen::onClickUp() {
-  menu.goto_screen(ScreenAllocator::allocate(MainMenuScreen()));
+  menu.goto_screen(ScreenAllocator::allocate<MainMenuScreen>());
   return true;
 }
 
@@ -79,7 +80,7 @@ void AlarmScreen::onExit() {
 
 
 bool AlarmScreen::onClickUp() {
-  menu.goto_screen(ScreenAllocator::allocate(MainScreen()));
+  menu.goto_screen(ScreenAllocator::allocate<MainScreen>());
   return true;
 }
 
