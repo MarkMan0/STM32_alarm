@@ -18,7 +18,9 @@ namespace rtos_obj {
   TaskHandle_t display_handle;
   TaskHandle_t command_handle;
   TaskHandle_t gpio_handle;
+#ifdef MONITOR_TASK
   TaskHandle_t monitor_handle;
+#endif
   TaskHandle_t uart2_tx_handle;
 };  // namespace rtos_obj
 
@@ -77,6 +79,8 @@ void rtos_tasks::gpio_task(void*) {
 
 
 
+#ifdef MONITOR_TASK
+
 void rtos_tasks::monitor_task(void*) {
   /// wait for all tasks to start
   vTaskDelay(pdMS_TO_TICKS(10000));
@@ -106,6 +110,7 @@ void rtos_tasks::monitor_task(void*) {
   }
 }
 
+#endif
 
 /// Called by freertos on stack overflow in any task
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char* pcTaskName) {
