@@ -47,22 +47,28 @@ void rtos_tasks::gpio_task(void*) {
 
   while (1) {
     uint32_t ms{ 0 };
+    uint32_t notif = rtos_obj::FLAG_NONE;
+
     if (pdPASS == xQueueReceive(rtos_obj::gpio_queue, &cont, next_timeout)) {
       /// new data received for GPIO, pass it to classes
       if (cont.pin_A & 2 && cont.pin_B & 2) {
-        encoder.enc.update(cont.pin_A & 1, cont.pin_B & 1);
+        if (encoder.enc.update(cont.pin_A & 1, cont.pin_B & 1)) {
+          notif |= rtos_obj::FLAG_ENCODER_CHANGED;
+        }
       }
       if (cont.pin_SW & 2) {
         ms = encoder.btn.update_btn(cont.pin_SW & 1);
+        notif |= rtos_obj::FLAG_BTN_CHANGED;
       }
-      if (cont.pin_alarm & 2 && not(cont.pin_alarm & 1)) {
+      if (cont.pin_alarm & 2 && (cont.pin_alarm & 1) == 0) {
         // alarm
-        /// @todo use queues with events to signal display task, not notification
+        notif |= rtos_obj::FLAG_ALARM_DETECTED;
       }
 
     } else {
       /// timeout elapsed, call update on button to track state
       ms = encoder.btn.update_btn(cont.pin_SW & 1);
+      notif |= rtos_obj::FLAG_BTN_CHANGED;
     }
 
     /// ms will be non-zero, if this task should be called without user input
@@ -73,7 +79,7 @@ void rtos_tasks::gpio_task(void*) {
     }
 
     /// Something happened, notify the UI task
-    xTaskNotify(rtos_obj::display_handle, 0, eNoAction);
+    xTaskNotify(rtos_obj::display_handle, notif, eSetBits);
   }
 }
 

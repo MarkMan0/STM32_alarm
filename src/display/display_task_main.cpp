@@ -54,7 +54,8 @@ static void ui_task_tick() {
   static uint32_t next_sleep = 99999;
   static uint32_t timeout = 100;
 
-  const BaseType_t result = xTaskNotifyWait(0, UINT32_MAX, nullptr, timeout);
+  uint32_t notif = 0;
+  const BaseType_t result = xTaskNotifyWait(0, UINT32_MAX, &notif, timeout);
 
 
   if (result == pdPASS) {
@@ -69,7 +70,7 @@ static void ui_task_tick() {
 
     ui_state = RUNNING;
 
-    if (read_pin(pins::alarm_it) == 0) {
+    if (notif & rtos_obj::FLAG_ALARM_DETECTED) {
       // is wakeup on alarm?
       // only entered once per alarm
       ui_state = PRE_ALARM;

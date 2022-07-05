@@ -40,4 +40,12 @@ namespace rtos_obj {
 #endif
   extern TaskHandle_t uart2_tx_handle;  ///< UART2 tx task handle
 
+
+  enum gpio_notification_flags : uint32_t {
+    FLAG_NONE = 0,
+    FLAG_ENCODER_CHANGED = 1 << 0,
+    FLAG_BTN_CHANGED = 1 << 1,
+    FLAG_ALARM_DETECTED = 1 << 2,
+  };
+
 };  // namespace rtos_obj
