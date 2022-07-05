@@ -9,7 +9,7 @@
 #include "abstract_screen.h"
 #include "DS3231.h"
 #include <algorithm>
-
+#include <type_traits>
 
 /// The default screen
 class MainScreen : public AbstractScreen {
@@ -112,6 +112,7 @@ public:
   template <class T, class... Args>
   static AbstractScreen* allocate(Args&&... args) {
     static_assert(sizeof(T) <= mem_sz);
+    static_assert(std::is_base_of<AbstractScreen, T>::value);
 
     void* const ptr = flag_ ? storage_1_ : storage_2_;
     flag_ = not flag_;
