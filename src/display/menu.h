@@ -20,9 +20,15 @@ public:
     was_sleeping_ = true;
   }
 
-  /// Goes to the next screen. Does not own @p scr
-  void goto_screen(AbstractScreen* scr) {
-    next_screen_ = scr;
+  /**
+   * @brief Allocate a new screen and switch to it
+   *
+   * @tparam T type of screen
+   * @param args arguments to constructor of T
+   */
+  template <class T, class... Args>
+  void goto_screen(Args&&... args) {
+    next_screen_ = ScreenAllocator::allocate<T>(std::forward<Args>(args)...);
   }
 
 

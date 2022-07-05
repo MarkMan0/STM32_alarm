@@ -30,7 +30,7 @@ static ui_state_t ui_state{ RUNNING };
 static void check_and_handle_alarm(int n) {
   bool b = false;
   if (0 == rtc.get_and_clear_alarm_flag(n, b) && b) {
-    menu.goto_screen(ScreenAllocator::allocate<AlarmScreen>(n));
+    menu.goto_screen<AlarmScreen>(n);
   }
 }
 static void check_and_handle_alarms() {
