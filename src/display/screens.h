@@ -102,6 +102,25 @@ public:
 
 public:
   /**
+   * @brief Construct temporary objects in storage spaces
+   * @details It is needed, so destructor can be called when creating new screen.
+   * Without this, 2 flags would be required to check, if the storage contains a valid object
+   * @tparam T type of AbstractScreen
+   * @param args constructor arguments to T
+   * @return pointer to storage 1 with screen T
+   */
+  template <class T, class... Args>
+  static AbstractScreen* init(Args&&... args) {
+    static_assert(sizeof(T) <= mem_sz);
+    static_assert(std::is_base_of<AbstractScreen, T>::value);
+    new (storage_1_) T(std::forward<Args>(args)...);
+    new (storage_2_) T(std::forward<Args>(args)...);
+
+    flag_ = false;  // use storage 2 next
+    return reinterpret_cast<AbstractScreen*>(storage_1_);
+  }
+
+  /**
    * @brief Construct a screen in preallocated static memory
    *
    * @tparam T type of screen
@@ -117,6 +136,9 @@ public:
     void* const ptr = flag_ ? storage_1_ : storage_2_;
     flag_ = not flag_;
 
+    // destructor of previous screen
+    reinterpret_cast<AbstractScreen*>(ptr)->~AbstractScreen();
+    // create new screen
     new (ptr) T(std::forward<Args>(args)...);
     return reinterpret_cast<AbstractScreen*>(ptr);
   }
