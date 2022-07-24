@@ -109,6 +109,9 @@ uint16_t UART_DMA::vprintf_ISR(const char* fmt, va_list args) {
   auto msglen = npf_vsnprintf(nullptr, 0, fmt, args);
 
   utils::LockISR lck(tx_buff_mtx_);
+  if (not lck()) {
+    return 0;
+  }
 
   uint8_t* ptr = transmit_buff_.reserve(msglen + 1);
 

@@ -36,13 +36,20 @@ namespace utils {
   struct LockISR {
   private:
     const SemaphoreHandle_t mtx_{};
+    bool is_locked_ = false;
 
   public:
     LockISR(SemaphoreHandle_t mtx) : mtx_(mtx) {
-      xSemaphoreTakeFromISR(mtx_, nullptr);
+      is_locked_ = pdTRUE == xSemaphoreTakeFromISR(mtx_, nullptr);
     }
     ~LockISR() {
-      xSemaphoreGiveFromISR(mtx_, nullptr);
+      if (is_locked_) {
+        xSemaphoreGiveFromISR(mtx_, nullptr);
+      }
+    }
+
+    [[nodiscard]] bool operator()() const {
+      return is_locked_;
     }
   };
 
