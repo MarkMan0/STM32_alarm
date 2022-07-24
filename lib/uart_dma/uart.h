@@ -123,7 +123,7 @@ public:
     rx_notify_task_ = t;
   }
 
-  const RingBuffer<uint8_t, 128>& get_dma_buff() const {
+  const RingBuffer<uint8_t, 128, true>& get_dma_buff() const {
     return dma_buff_;
   }
 
@@ -146,7 +146,7 @@ private:
   uint16_t last_rxdma_pos_{ 0 };  ///< Used in rx event callback to track DMA
 
 
-  RingBuffer<uint8_t, 128> dma_buff_;
+  RingBuffer<uint8_t, 128, true> dma_buff_;
   RingBuffer<uint8_t, 64> transmit_buff_;  ///< Buffer for non-immediate transmission
 
   const hw_init_fcn_t* hw_init_cb;

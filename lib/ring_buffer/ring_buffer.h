@@ -14,12 +14,15 @@
  * @tparam T type in buffer
  * @tparam N number of elements in buffer
  */
-template <class T = uint8_t, uint16_t N = 64>
+template <class T = uint8_t, uint16_t N = 64, bool ADD_VOLATILE = false>
 class RingBuffer {
+private:
+  using index_t = typename std::conditional<ADD_VOLATILE, volatile uint16_t, uint16_t>::type;
+
 public:
   using data_t = T;
-  std::array<data_t, N> buff_;
-  uint16_t head_{}, tail_{};
+  std::array<T, N> buff_;
+  index_t head_{}, tail_{};
   bool is_full_ = false;
 
   /// Place and element into the buffer
