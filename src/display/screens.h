@@ -5,7 +5,7 @@
  */
 
 #pragma once
-
+#include "main.h"
 #include "abstract_screen.h"
 #include "DS3231.h"
 #include <algorithm>
@@ -71,7 +71,13 @@ public:
   bool onClickUp() override;  ///< end alarm
 
 private:
+  void start_beep();  ///< Enable timer
+  void beep_tick();   ///< Periodically disable timer
+  void stop_beep();   ///< Disable timer
+
   bool blink_flag_ = false;
   uint32_t next_blink_ = 0;
+  uint32_t next_beep_ = 0;
+  bool beep_state_ = true;
   int alarm_no_{ 0 };
 };

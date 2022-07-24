@@ -63,19 +63,38 @@ bool MainScreen::onClickUp() {
 }
 
 
-static void start_led_blink() {
+void AlarmScreen::start_beep() {
+  HAL_TIM_Base_Start(&htim2);
+  HAL_TIM_OC_Start(&htim2, TIM_CHANNEL_2);
+  next_beep_ = HAL_GetTick() + 500;
 }
 
-static void stop_led_blink() {
+void AlarmScreen::beep_tick() {
+  if (utils::elapsed(HAL_GetTick(), next_beep_)) {
+    next_beep_ = HAL_GetTick() + 500;
+    if (beep_state_) {
+      // HAL_TIM_Base_Stop(&htim2);
+      HAL_TIM_OC_Stop(&htim2, TIM_CHANNEL_2);
+    } else {
+      // HAL_TIM_Base_Start(&htim2);
+      HAL_TIM_OC_Start(&htim2, TIM_CHANNEL_2);
+    }
+    beep_state_ = not beep_state_;
+  }
+}
+
+void AlarmScreen::stop_beep() {
+  HAL_TIM_Base_Stop(&htim2);
+  HAL_TIM_OC_Stop(&htim2, TIM_CHANNEL_2);
 }
 
 void AlarmScreen::onEntry() {
-  start_led_blink();
+  start_beep();
   next_blink_ = HAL_GetTick() + 500;
 }
 
 void AlarmScreen::onExit() {
-  stop_led_blink();
+  stop_beep();
 }
 
 
@@ -104,4 +123,5 @@ void AlarmScreen::draw() {
   gfx.printf("Alarm %d", alarm_no_);
 
   gfx.draw();
+  beep_tick();
 }

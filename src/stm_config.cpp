@@ -6,6 +6,7 @@
 #include "main.h"
 #include "stm_config.h"
 #include "FreeRTOS.h"
+#include "globals.h"
 
 TIM_HandleTypeDef htim7;  ///< Timer used for HAL tick
 
@@ -138,4 +139,52 @@ void HAL_SuspendTick(void) {
 /// Called by HAL to resume the timer
 void HAL_ResumeTick(void) {
   __HAL_TIM_ENABLE_IT(&htim7, TIM_IT_UPDATE);
+}
+
+
+static void TIM2_Msp_Init(TIM_HandleTypeDef* htim) {
+  assert_param(htim == &htim2);
+  assert_param(htim->Instance == TIM2);
+  __HAL_RCC_TIM2_CLK_ENABLE();
+}
+
+// TIM 2
+TIM_HandleTypeDef htim2;
+
+void TIM2_Init_1kHz() {
+  TIM_ClockConfigTypeDef clk_src_config = { 0 };
+  TIM_MasterConfigTypeDef master_config = { 0 };
+  TIM_OC_InitTypeDef oc_config = { 0 };
+
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 35;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 999;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+
+  HAL_TIM_RegisterCallback(&htim2, HAL_TIM_BASE_MSPINIT_CB_ID, TIM2_Msp_Init);
+
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK) {
+    Error_Handler();
+  }
+  clk_src_config.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &clk_src_config) != HAL_OK) {
+    Error_Handler();
+  }
+  if (HAL_TIM_OC_Init(&htim2) != HAL_OK) {
+    Error_Handler();
+  }
+  master_config.MasterOutputTrigger = TIM_TRGO_RESET;
+  master_config.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &master_config) != HAL_OK) {
+    Error_Handler();
+  }
+  oc_config.OCMode = TIM_OCMODE_ACTIVE;
+  oc_config.Pulse = 500;
+  oc_config.OCPolarity = TIM_OCPOLARITY_HIGH;
+  oc_config.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_OC_ConfigChannel(&htim2, &oc_config, TIM_CHANNEL_2) != HAL_OK) {
+    Error_Handler();
+  }
 }

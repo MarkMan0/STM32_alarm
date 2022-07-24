@@ -17,6 +17,7 @@ extern UART_DMA uart2;           ///< Uart for communication with PC
 extern RTOS_I2C i2c;             ///< I2C bus with the RTC and OLED
 extern DS3231 rtc;               ///< RTC
 extern TIM_HandleTypeDef htim7;  ///< HAL tick timer
+extern TIM_HandleTypeDef htim2;  ///< beep timer
 extern RotaryEncoder encoder;    ///< Rotary encoder
 
 
